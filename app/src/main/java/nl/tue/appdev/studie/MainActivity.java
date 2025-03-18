@@ -15,13 +15,34 @@ import androidx.navigation.ui.NavigationUI;
 
 import nl.tue.appdev.studie.databinding.ActivityMainBinding;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+// bunch of imports we might need later
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        database = FirebaseDatabase.getInstance("https://studie2is70-default-rtdb.europe-west1.firebasedatabase.app/");
+        mDatabase = database.getReference();
+
     }
 
     @Override
@@ -74,4 +99,17 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("State", "onStart");
+    }
+
+    public void sendToDB(String data) {
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue(data);
+    }
+
 }
