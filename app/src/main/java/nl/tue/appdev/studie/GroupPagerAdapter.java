@@ -16,7 +16,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 public class GroupPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
+    private static final int[] TAB_TITLES = new int[]{R.string.notes_string, R.string.flashcards_string, R.string.sets_string};
     private final Context mContext;
     int totalTabs;
 
@@ -41,13 +41,13 @@ public class GroupPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    /*
+
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
         return mContext.getResources().getString(TAB_TITLES[position]);
     }
-     */
+
 
     @Override
     public int getCount() {
