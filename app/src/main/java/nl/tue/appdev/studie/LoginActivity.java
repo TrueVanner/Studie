@@ -24,16 +24,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Button signup = findViewById(R.id.Signup_buttonz);
 
+        Button login = findViewById(R.id.login_button_login);
+        Button signup = findViewById(R.id.signup_button_login);
+
+        login.setOnClickListener(this);
         signup.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        Intent next = new Intent(LoginActivity.this, WelcomeActivity.class);
-        if (id == R.id.Signup_buttonz)
-            startActivity(next);
+        Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
+        if (id == R.id.login_button_login) {
+            startActivity(toHome);
+        } else {
+            String toastText = "Undefined request";
+            if (id == R.id.signup_button_login) {
+                toastText = "Go to Sign Up";
+            }
+            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
+        }
     }
 }
