@@ -25,8 +25,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             return insets;
         });
 
-        Button login = findViewById(R.id.Login_button);
-        Button signup = findViewById(R.id.Signup_button);
+        Button login = findViewById(R.id.login_button_welcome);
+        Button signup = findViewById(R.id.signup_button_welcome);
 
         signup.setOnClickListener(this);
         login.setOnClickListener(this);
@@ -35,10 +35,15 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        Intent next = new Intent(WelcomeActivity.this, LoginActivity.class);
-        if (id == R.id.Signup_button)
-            startActivity(next);
-        else if (id == R.id.Login_button)
-            Toast.makeText(this, "Login", Toast.LENGTH_SHORT).show();
+        Intent toLogin = new Intent(WelcomeActivity.this, LoginActivity.class);
+        if (id == R.id.login_button_welcome) {
+            startActivity(toLogin);
+        } else {
+            String toastText = "Undefined request";
+            if (id == R.id.signup_button_welcome) {
+                toastText = "Go to Sign Up";
+            }
+            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
+        }
     }
 }

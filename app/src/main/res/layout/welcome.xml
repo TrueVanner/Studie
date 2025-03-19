@@ -8,7 +8,7 @@
     android:background="@drawable/welcome_back">
 
     <Button
-        android:id="@+id/Login_button"
+        android:id="@+id/login_button_welcome"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/Transparent"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
     <Button
-        android:id="@+id/Signup_button"
+        android:id="@+id/signup_button_welcome"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/Transparent"
