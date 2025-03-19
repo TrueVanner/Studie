@@ -27,7 +27,18 @@
             android:theme="@style/Theme.Studie">
         </activity>
         <activity
+            android:name=".SignupActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Studie">
+
+        </activity>
+        <activity
             android:name=".HomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Studie">
+        </activity>
+        <activity
+            android:name=".AccountActivity"
             android:exported="true"
             android:theme="@style/Theme.Studie">
         </activity>
