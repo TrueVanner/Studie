@@ -1,4 +1,4 @@
-package nl.tue.appdev.studie.ui.main;
+package nl.tue.appdev.studie;
 
 import android.os.Bundle;
 
@@ -7,8 +7,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import nl.tue.appdev.studie.R;
 
 /**
  * A simple {@link Fragment} subclass.

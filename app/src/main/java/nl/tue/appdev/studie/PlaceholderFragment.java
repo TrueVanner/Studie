@@ -1,4 +1,4 @@
-package nl.tue.appdev.studie.ui.main;
+package nl.tue.appdev.studie;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import nl.tue.appdev.studie.R;
 import nl.tue.appdev.studie.databinding.FragmentGroupBinding;
 
 /**
