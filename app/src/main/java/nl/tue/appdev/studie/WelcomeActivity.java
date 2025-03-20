@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -13,7 +14,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
-
+    ImageButton login;
+    ImageButton signup;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,8 +27,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             return insets;
         });
 
-        Button login = findViewById(R.id.login_button_welcome);
-        Button signup = findViewById(R.id.logout_button_account);
+        login = (ImageButton) findViewById(R.id.login_button_welcome);
+        signup = (ImageButton) findViewById(R.id.signup_button_welcome);
 
         signup.setOnClickListener(this);
         login.setOnClickListener(this);
@@ -39,7 +41,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         Intent toSignup = new Intent(WelcomeActivity.this, SignupActivity.class);
         if (id == R.id.login_button_welcome) {
             startActivity(toLogin);
-        } else if (id == R.id.logout_button_account) {
+        } else if (id == R.id.signup_button_welcome) {
                 startActivity(toSignup);
         } else {
             String toastText = "Undefined request";
