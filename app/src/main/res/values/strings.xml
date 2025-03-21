@@ -9,6 +9,7 @@
     <string name="send">Send</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="sign_up_hyperlink">Not a member yet? <font color='#25A7F2'>Sign up!</font></string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

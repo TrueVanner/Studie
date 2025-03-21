@@ -1,9 +1,11 @@
+//TODO: How tf do hyperlinks work istfg this shit is melting my brain
 package nl.tue.appdev.studie;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -13,7 +15,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
-
+    ImageButton login;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,11 +27,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return insets;
         });
 
-        Button login = findViewById(R.id.login_button_login);
-        Button signup = findViewById(R.id.signup_button_login);
+        login = (ImageButton) findViewById(R.id.login_button_login);
 
         login.setOnClickListener(this);
-        signup.setOnClickListener(this);
     }
 
     @Override
@@ -40,9 +40,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(toHome);
         } else {
             String toastText = "Undefined request";
-            if (id == R.id.signup_button_login) {
-                toastText = "Go to Sign Up";
-            }
             Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }
