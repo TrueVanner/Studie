@@ -47,9 +47,6 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="title_activity_group">GroupActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="notes_string">Notes</string>
     <string name="flashcards_string">Flashcards</string>
     <string name="sets_string">Sets</string>

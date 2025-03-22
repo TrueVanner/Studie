@@ -26,12 +26,8 @@ public class GroupActivity extends AppCompatActivity {
         binding = ActivityGroupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        GroupPagerAdapter groupPagerAdapter = new GroupPagerAdapter(this, getSupportFragmentManager(), 3);
-        viewPager = binding.viewPager;
-        viewPager.setAdapter(groupPagerAdapter);
-        tabLayout = binding.tabs;
-        tabLayout.setupWithViewPager(viewPager);
-        FloatingActionButton fab = binding.fab;
+        tabLayout = findViewById(R.id.tabs);
+        viewPager = findViewById(R.id.view_pager);
 
         // add tabs
         tabLayout.addTab(tabLayout.newTab().setText("Notes"));
@@ -40,6 +36,13 @@ public class GroupActivity extends AppCompatActivity {
 
         // set width to screen width
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        GroupPagerAdapter groupPagerAdapter = new GroupPagerAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount());
+        //viewPager = binding.viewPager;
+        viewPager.setAdapter(groupPagerAdapter);
+        //tabLayout = binding.tabs;
+        tabLayout.setupWithViewPager(viewPager);
+        FloatingActionButton fab = binding.fab;
 
         // connect viewpager changes to tab layout
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));

@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         int id = v.getId();
-//        Intent toAccount = new Intent();
+        Intent toAccount = new Intent(HomeActivity.this, AccountActivity.class);
 //        Intent toCreateGroup = new Intent();
 //        Intent toJoinGroup = new Intent();
         Intent toGroup = new Intent(HomeActivity.this, GroupActivity.class);
@@ -60,11 +60,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             } catch (Exception e) {
                 Logger.getLogger(HomeActivity.class.getName()).severe("Error switching to group activity");
             }
+        } else if(id == R.id.account_button) {
+            startActivity(toAccount);
         } else {
             String toastText = "Undefined request";
-            if(id == R.id.account_button) {
-                toastText = "Go to Account";
-            }
             if(id == R.id.create_group_button) {
                 toastText = "Go to Create Group";
             }
