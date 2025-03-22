@@ -39,6 +39,9 @@ android {
 }
 
 dependencies {
+    // auth
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -93,7 +96,7 @@ val coverageExclusions = listOf(
 )
 
 // Apply additional build steps to sub-projects
-subprojects.forEach() { project ->
+subprojects.forEach { project ->
     if (!ignoredByJacoco.contains(project.name)) {
         project.pluginManager.apply("jacoco")
 

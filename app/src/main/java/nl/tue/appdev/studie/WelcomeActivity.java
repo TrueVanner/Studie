@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -13,9 +12,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
-    ImageButton login;
-    ImageButton signup;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,24 +27,35 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             return insets;
         });
 
-        login = (ImageButton) findViewById(R.id.login_button_welcome);
-        signup = (ImageButton) findViewById(R.id.signup_button_welcome);
+        mAuth = FirebaseAuth.getInstance();
+
+        Button login = findViewById(R.id.button_login);
+        Button signup = findViewById(R.id.button_signup);
 
         signup.setOnClickListener(this);
         login.setOnClickListener(this);
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (mAuth.getCurrentUser() != null) {
+            Intent toHome = new Intent(WelcomeActivity.this, HomeActivity.class);
+            startActivity(toHome);
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         int id = v.getId();
         Intent toLogin = new Intent(WelcomeActivity.this, LoginActivity.class);
-        Intent toSignup = new Intent(WelcomeActivity.this, SignupActivity.class);
-        if (id == R.id.login_button_welcome) {
+        if (id == R.id.button_login) {
             startActivity(toLogin);
-        } else if (id == R.id.signup_button_welcome) {
-                startActivity(toSignup);
         } else {
             String toastText = "Undefined request";
+            if (id == R.id.button_signup) {
+                toastText = "Go to Sign Up";
+            }
             Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }
