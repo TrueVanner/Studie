@@ -2,8 +2,11 @@ package nl.tue.appdev.studie;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +14,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+    private FirebaseAuth mAuth;
+    private static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +31,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             return insets;
         });
 
+        mAuth = FirebaseAuth.getInstance();
+
         Button login = findViewById(R.id.button_log_in);
         Button gotoSignup = findViewById(R.id.button_go_to_signup);
 
@@ -35,31 +44,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         int id = v.getId();
         Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
-        Intent toSignup = new Intent(LoginActivity.this, CreateAccountActivity.class);
+//        Intent toSignup = new Intent(LoginActivity.this, CreateAccountActivity.class);
         if (id == R.id.button_log_in) {
-            startActivity(toHome);
-        } else if(id == R.id.button_go_to_signup) {
-            startActivity(toSignup);
-        } else {
-            // login code
-            /*mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "signInWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                Toast.makeText(EmailPasswordActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                                updateUI(null);
-                            }
+            EditText email = findViewById(R.id.login_input_email);
+            EditText password = findViewById(R.id.login_input_password);
+
+            mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(LoginActivity.class.getSimpleName(), "signInWithEmail:success");
+                            startActivity(toHome);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+//                            updateUI(null);
                         }
-                    });*/
+                    });
+        }/* else if(id == R.id.button_go_to_signup) {
+            startActivity(toSignup);
+        }*/ else {
+            
         }
     }
 }
