@@ -1,4 +1,4 @@
-package nl.tue.appdev.studie;
+package nl.tue.appdev.studie.original_examples;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import nl.tue.appdev.studie.R;
 import nl.tue.appdev.studie.databinding.FragmentFirstBinding;
 
 public class FirstFragment extends Fragment {

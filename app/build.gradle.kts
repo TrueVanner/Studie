@@ -45,6 +45,10 @@ dependencies {
     // firestore
     implementation(libs.firebase.firestore)
 
+    // qr code
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android.embedded)
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -58,9 +62,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    // qr code
-    implementation(libs.zxing.core)
-    implementation(libs.zxing.android.embedded)
+
 }
 
 

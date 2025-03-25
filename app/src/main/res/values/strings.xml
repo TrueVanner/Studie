@@ -9,6 +9,8 @@
     <string name="send">Send</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="no_camera_perms">Grant camera permissions manually through settings to enable QR code scanning.</string>
+    <string name="go_to_camera_settings">Go to camera settings</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
