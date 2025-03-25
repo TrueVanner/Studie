@@ -1,5 +1,6 @@
 package nl.tue.appdev.studie;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -24,8 +25,14 @@ public class QRCodeScannerActivity extends AppCompatActivity {
         barcodeView.decodeContinuous(new BarcodeCallback() {
             @Override
             public void barcodeResult(BarcodeResult result) {
-                Toast.makeText(QRCodeScannerActivity.this, "Scanned: " + result.getText(), Toast.LENGTH_SHORT).show();
+                String scannedContent = result.getText();
+                Toast.makeText(QRCodeScannerActivity.this, "Scanned: " + scannedContent, Toast.LENGTH_SHORT).show();
                 barcodeView.pause();
+
+                // Start DisplayQRCodeContentActivity with the scanned content
+                Intent intent = new Intent(QRCodeScannerActivity.this, DisplayQRCodeContentActivity.class);
+                intent.putExtra("SCANNED_CONTENT", scannedContent);
+                startActivity(intent);
             }
 
             @Override
