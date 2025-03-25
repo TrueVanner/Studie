@@ -27,6 +27,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             return insets;
         });
 
+
+        /*
+
         Button account = findViewById(R.id.account_button);
         Button createGroup = findViewById(R.id.create_group_button);
         Button joinGroup = findViewById(R.id.join_group_button);
@@ -43,36 +46,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         groupB.setOnClickListener(this);
         groupC.setOnClickListener(this);
         search.setOnClickListener(this);
+
+         */
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        Intent toAccount = new Intent(HomeActivity.this, AccountActivity.class);
-//        Intent toCreateGroup = new Intent();
-//        Intent toJoinGroup = new Intent();
         Intent toGroup = new Intent(HomeActivity.this, GroupActivity.class);
-//        Intent toSearch = new Intent();
-
-        if (id == R.id.temp_groupA_button || id == R.id.temp_groupB_button || id == R.id.temp_groupC_button) {
-            try {
-                startActivity(toGroup);
-            } catch (Exception e) {
-                Logger.getLogger(HomeActivity.class.getName()).severe("Error switching to group activity");
-            }
-        } else if(id == R.id.account_button) {
+        Intent toAccount = new Intent(HomeActivity.this, AccountActivity.class);
+        //Intent toJoin = ...
+        //Intent toCreate = ...
+        if (id == R.id.home_create) {
+            startActivity(toGroup);
+        } else if (id == R.id.home_account) {
             startActivity(toAccount);
         } else {
             String toastText = "Undefined request";
-            if(id == R.id.create_group_button) {
-                toastText = "Go to Create Group";
-            }
-            if(id == R.id.join_group_button) {
-                toastText = "Go to Join Group";
-            }
-            if(id == R.id.temp_search_button) {
-                toastText = "Go to Search";
-            }
             Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }
