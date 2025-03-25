@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/login"
+    android:id="@+id/signup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_back">
+    android:background="@drawable/create_account">
 
     <EditText
         android:id="@+id/editTextText2"
@@ -32,49 +32,59 @@
         app:layout_constraintTop_toTopOf="@+id/guideline18" />
 
     <Button
-        android:id="@+id/button_log_in"
+        android:id="@+id/button_sign_up"
         android:layout_width="293dp"
         android:layout_height="48dp"
-        android:layout_marginTop="20dp"
-        android:background="@color/design_default_color_error"
+        android:layout_marginTop="32dp"
+        android:background="@color/Transparent"
         android:textColor="@color/Transparent"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="@+id/login_input_password"
-        app:layout_constraintHorizontal_bias="0.714"
-        app:layout_constraintStart_toStartOf="@+id/login_input_password"
-        app:layout_constraintTop_toBottomOf="@+id/login_input_password" />
+        app:layout_constraintEnd_toEndOf="@+id/signup_input_password"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/signup_input_password"
+        app:layout_constraintTop_toBottomOf="@+id/signup_input_password" />
 
     <Button
-        android:id="@+id/button_go_to_signup"
-        android:layout_width="72dp"
-        android:layout_height="23dp"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="216dp"
-        android:background="@color/design_default_color_error"
-        android:visibility="visible"
+        android:id="@+id/button_go_to_login"
+        android:layout_width="50dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="480dp"
+        android:background="@color/Transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
-        android:id="@+id/login_input_email"
+        android:id="@+id/input_name"
         android:layout_width="290dp"
         android:layout_height="45dp"
-        android:layout_marginTop="272dp"
+        android:layout_marginTop="312dp"
         android:ems="10"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.479"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/login_input_password"
+        android:id="@+id/signup_input_email"
         android:layout_width="286dp"
         android:layout_height="46dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="36dp"
         android:ems="10"
         android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/login_input_email"
-        app:layout_constraintStart_toStartOf="@+id/login_input_email"
-        app:layout_constraintTop_toBottomOf="@+id/login_input_email" />
+        app:layout_constraintEnd_toEndOf="@+id/input_name"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/input_name"
+        app:layout_constraintTop_toBottomOf="@+id/input_name" />
 
+    <EditText
+        android:id="@+id/signup_input_password"
+        android:layout_width="283dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="36dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="@+id/signup_input_email"
+        app:layout_constraintStart_toStartOf="@+id/signup_input_email"
+        app:layout_constraintTop_toBottomOf="@+id/signup_input_email" />
 </androidx.constraintlayout.widget.ConstraintLayout>
