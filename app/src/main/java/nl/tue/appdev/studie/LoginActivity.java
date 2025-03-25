@@ -20,6 +20,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private FirebaseAuth mAuth;
     private static final String TAG = "LoginActivity";
 
+    private EditText emailInput;
+    private EditText passwordInput;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +36,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mAuth = FirebaseAuth.getInstance();
 
+        emailInput = findViewById(R.id.login_input_email);
+        passwordInput = findViewById(R.id.login_input_password);
+
         Button login = findViewById(R.id.button_log_in);
         Button gotoSignup = findViewById(R.id.button_go_to_signup);
 
@@ -40,16 +46,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         gotoSignup.setOnClickListener(this);
     }
 
+    public enum UpdateType { BAD_EMAIL, BAD_PASSWORD, LOGIN_FAILED }
+
+    private void updateUI(UpdateType updateType) {
+        switch(updateType) {
+            case BAD_EMAIL:
+                emailInput.setError("Please enter your email address.");
+                break;
+            case BAD_PASSWORD:
+                passwordInput.setError("Please enter your password.");
+                break;
+            case LOGIN_FAILED:
+                break;
+        }
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
         Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
-//        Intent toSignup = new Intent(LoginActivity.this, CreateAccountActivity.class);
+        Intent toSignup = new Intent(LoginActivity.this, SignupActivity.class);
         if (id == R.id.button_log_in) {
-            EditText email = findViewById(R.id.login_input_email);
-            EditText password = findViewById(R.id.login_input_password);
+            // Read user inputs
+            String email = emailInput.getText().toString();
+            String password = passwordInput.getText().toString();
 
-            mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+            // Check if fields are nonempty
+            if (email.isBlank()) {
+                updateUI(UpdateType.BAD_EMAIL);
+                return;
+            }
+            if (password.isBlank()) {
+                updateUI(UpdateType.BAD_PASSWORD);
+                return;
+            }
+
+            // Fields are nonempty, try to login user
+            mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
@@ -60,13 +93,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
+                            updateUI(UpdateType.LOGIN_FAILED);
                         }
                     });
-        }/* else if(id == R.id.button_go_to_signup) {
+        } else if (id == R.id.button_go_to_signup) {
             startActivity(toSignup);
-        }*/ else {
-            
         }
     }
 }

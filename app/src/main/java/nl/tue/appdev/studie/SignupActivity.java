@@ -31,7 +31,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     private static final String TAG = "SignupActivity";
     private FirebaseAuth mAuth;
-    private EditText nameInput, emailInput, passwordInput;
+    private EditText nameInput;
+    private EditText emailInput;
+    private EditText passwordInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +58,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     enum UpdateType { BAD_NAME, BAD_PASSWORD, BAD_EMAIL, BAD_AUTH }
 
-    public void updateUI(UpdateType updateType) {
+    private void updateUI(UpdateType updateType) {
         switch(updateType) {
             case BAD_NAME:
                 nameInput.setError("Name can't be empty!");
@@ -78,7 +80,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
         Intent toHome = new Intent(SignupActivity.this, HomeActivity.class);
-        if (id == R.id.signup_button_create) {
+        if (id == R.id.button_sign_up) {
             String name = nameInput.getText().toString();
             String email = emailInput.getText().toString();
             String password = passwordInput.getText().toString();
@@ -88,7 +90,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 updateUI(UpdateType.BAD_NAME);
                 return;
             }
-            if(!email.matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")) {
+            if(!email.toLowerCase().matches("[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}")) {
                 updateUI(UpdateType.BAD_EMAIL);
                 return;
             }
