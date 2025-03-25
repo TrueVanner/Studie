@@ -2,6 +2,7 @@ package nl.tue.appdev.studie;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -12,9 +13,25 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.util.logging.Logger;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Map;
+import java.util.Vector;
+//import java.util.logging.Logger;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "HomeActivity";
+
+    private FirebaseAuth mAuth;
+
+    private Map<String, Object> userDocument;
+
+    private Object groups; // ID, name
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +44,30 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             return insets;
         });
 
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get groups that user is in
+        FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
+        String userID = user.getUid();
+        DocumentReference docRef = db.collection("users").document(userID);
+        docRef.get().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    userDocument = document.getData();
+                    assert userDocument != null;
+                    groups = userDocument.get("groups");
+                    Log.d(TAG, String.valueOf(groups));
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
 
         /*
 
