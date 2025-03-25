@@ -53,9 +53,14 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // qr code
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android.embedded)
 }
 
 
