@@ -39,6 +39,11 @@ android {
 }
 
 dependencies {
+    // auth
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    // firestore
+    implementation(libs.firebase.firestore)
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -48,9 +53,14 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // qr code
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android.embedded)
 }
 
 
@@ -93,7 +103,7 @@ val coverageExclusions = listOf(
 )
 
 // Apply additional build steps to sub-projects
-subprojects.forEach() { project ->
+subprojects.forEach { project ->
     if (!ignoredByJacoco.contains(project.name)) {
         project.pluginManager.apply("jacoco")
 
