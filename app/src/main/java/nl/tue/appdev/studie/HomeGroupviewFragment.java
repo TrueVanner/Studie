@@ -80,7 +80,6 @@ public class HomeGroupviewFragment extends Fragment {
                 Drawable background = ContextCompat.getDrawable(getContext(), R.drawable.button_simple);
                 button.setBackground(background);
 
-                // TODO: add transition to button
                 button.setOnClickListener(v -> {
                     Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show();
                     Intent toGroup = new Intent(getActivity(), GroupActivity.class);
