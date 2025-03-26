@@ -1,5 +1,6 @@
 package nl.tue.appdev.studie;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.Group;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
@@ -50,7 +52,8 @@ public class HomeGroupviewFragment extends Fragment {
 
         // Generate a list of buttons for the groups the user has joined
         for (Map.Entry<String, String> entry : groups.entrySet()) {
-            // Get group name from the entry in the hashmap
+            // Get group ID and name from the entry in the hashmap
+            String group_id = entry.getKey();
             String group_name = entry.getValue();
 
             // Only show a button if it matches the query
@@ -78,9 +81,12 @@ public class HomeGroupviewFragment extends Fragment {
                 button.setBackground(background);
 
                 // TODO: add transition to button
-                button.setOnClickListener(v ->
-                        Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show()
-                );
+                button.setOnClickListener(v -> {
+                    Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show();
+                    Intent toGroup = new Intent(getActivity(), GroupActivity.class);
+                    toGroup.putExtra("id", group_id);
+                    startActivity(toGroup);
+                });
 
                 // Add button to view
                 buttonContainer.addView(button);
