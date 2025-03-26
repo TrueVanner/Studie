@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,6 +21,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 //import java.util.logging.Logger;
@@ -31,7 +34,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private Map<String, Object> userDocument;
 
-    private Object groups; // ID, name
+    private HashMap<String, String> groups; // ID, name
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Create a group view fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        HomeGroupviewFragment groupview = new HomeGroupviewFragment();
+
+        // Add 'go to account' button
+        Button accountButton = findViewById(R.id.home_account);
+        accountButton.setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -59,8 +70,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                     userDocument = document.getData();
                     assert userDocument != null;
-                    groups = userDocument.get("groups");
+                    groups = (HashMap<String, String>) userDocument.get("groups");
                     Log.d(TAG, String.valueOf(groups));
+
+                    // Pass the hashmap of groups to the fragment
+                    if (groupview != null) {
+                        groupview.updateGroups(groups);
+
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.fragment_group_view, groupview)
+                                .commit();
+                    } else {
+                        Log.d(TAG, "fragment is null");
+                    }
                 } else {
                     Log.d(TAG, "No such document");
                 }
@@ -69,42 +91,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        /*
 
-        Button account = findViewById(R.id.account_button);
-        Button createGroup = findViewById(R.id.create_group_button);
-        Button joinGroup = findViewById(R.id.join_group_button);
 
-        Button groupA = findViewById(R.id.temp_groupA_button);
-        Button groupB = findViewById(R.id.temp_groupB_button);
-        Button groupC = findViewById(R.id.temp_groupC_button);
-        Button search = findViewById(R.id.temp_search_button);
+    }
 
-        account.setOnClickListener(this);
-        createGroup.setOnClickListener(this);
-        joinGroup.setOnClickListener(this);
-        groupA.setOnClickListener(this);
-        groupB.setOnClickListener(this);
-        groupC.setOnClickListener(this);
-        search.setOnClickListener(this);
-
-         */
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        Intent toGroup = new Intent(HomeActivity.this, GroupActivity.class);
-        Intent toAccount = new Intent(HomeActivity.this, AccountActivity.class);
-        //Intent toJoin = ...
-        //Intent toCreate = ...
-        if (id == R.id.home_create) {
-            startActivity(toGroup);
-        } else if (id == R.id.home_account) {
+        if (id == R.id.home_account) {
+            Intent toAccount = new Intent(HomeActivity.this, AccountActivity.class);
             startActivity(toAccount);
-        } else {
-            String toastText = "Undefined request";
-            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }
 }
