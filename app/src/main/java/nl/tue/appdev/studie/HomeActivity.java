@@ -3,8 +3,10 @@ package nl.tue.appdev.studie;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -36,6 +38,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private HashMap<String, String> groups; // ID, name
 
+    private EditText searchbar;
+    private String query;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +59,24 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         // Add 'go to account' button
         Button accountButton = findViewById(R.id.home_account);
         accountButton.setOnClickListener(this);
+
+        // Add searchbar
+
+        searchbar = findViewById(R.id.searchbar_home);
+        searchbar.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                Log.d(TAG, "Pressed: " + keyCode);
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    query = searchbar.getText().toString();
+                    Log.d(TAG, "Query: " + query);
+                    groupview.updateQuery(query);
+                    return true;
+                }
+            }
+            return false;
+        });
+
+
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();

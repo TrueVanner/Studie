@@ -29,48 +29,62 @@ public class HomeGroupviewFragment extends Fragment {
     private static final String TAG = "HomeGroupviewFragment";
     private FragmentFirstBinding binding;
     private HashMap<String, String> groups = new HashMap<String, String>();
+    private String query = "";
+
+    private LinearLayout buttonContainer;
 
     public void updateGroups(HashMap<String, String> g) {
         groups = g;
         Log.d(TAG, String.valueOf(g));
     }
 
-    public void displayGroups(View view) {
-        LinearLayout buttonContainer = view.findViewById(R.id.group_view_container);
+    public void updateQuery(String q) {
+        query = q;
+        Log.d(TAG, q);
+        displayGroups();
+    }
+
+    public void displayGroups() {
+        // Remove the old set of buttons
+        buttonContainer.removeAllViews();
 
         // Generate a list of buttons for the groups the user has joined
         for (Map.Entry<String, String> entry : groups.entrySet()) {
             // Get group name from the entry in the hashmap
             String group_name = entry.getValue();
 
-            // Create a button and set attributes
-            Button button = new Button(getContext());
-            button.setText(group_name);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    150
-            );
-            params.setMargins(0, 0, 0, 20);
-            button.setLayoutParams(params);
-            button.setTextColor(Color.WHITE);
-            button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
-            button.setPadding(30, 0, 0, 0);
-            button.setAllCaps(false);
-            button.setTextSize(17);
-            button.setSingleLine(true);
-            button.setEllipsize(TextUtils.TruncateAt.END);
+            // Only show a button if it matches the query
+            if (group_name.toLowerCase().contains(query.toLowerCase())) {
 
-            // Set background
-            Drawable background = ContextCompat.getDrawable(getContext(), R.drawable.button_simple);
-            button.setBackground(background);
+                // Create a button and set attributes
+                Button button = new Button(getContext());
+                button.setText(group_name);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        150
+                );
+                params.setMargins(0, 0, 0, 20);
+                button.setLayoutParams(params);
+                button.setTextColor(Color.WHITE);
+                button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+                button.setPadding(30, 0, 0, 0);
+                button.setAllCaps(false);
+                button.setTextSize(17);
+                button.setSingleLine(true);
+                button.setEllipsize(TextUtils.TruncateAt.END);
 
-            // TODO: add transition to button
-            button.setOnClickListener(v ->
-                    Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show()
-            );
+                // Set background
+                Drawable background = ContextCompat.getDrawable(getContext(), R.drawable.button_simple);
+                button.setBackground(background);
 
-            // Add button to view
-            buttonContainer.addView(button);
+                // TODO: add transition to button
+                button.setOnClickListener(v ->
+                        Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show()
+                );
+
+                // Add button to view
+                buttonContainer.addView(button);
+            }
         }
     }
 
@@ -83,11 +97,11 @@ public class HomeGroupviewFragment extends Fragment {
         return view;
     }
 
+    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        Log.d(TAG, String.valueOf(groups));
-        displayGroups(view);
+        buttonContainer = view.findViewById(R.id.group_view_container);
+        displayGroups();
     }
 
     @Override
