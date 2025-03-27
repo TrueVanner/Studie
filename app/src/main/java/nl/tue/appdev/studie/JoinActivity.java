@@ -117,44 +117,6 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        /*
-        // Get groups that user is in
-        FirebaseUser user = mAuth.getCurrentUser();
-        assert user != null;
-        String userID = user.getUid();
-        DocumentReference docRef = db.collection("users").document(userID);
-        docRef.get().addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    userDocument = document.getData();
-                    assert userDocument != null;
-                    groups = (HashMap<String, String>) userDocument.get("groups");
-                    Log.d(TAG, String.valueOf(groups));
-
-                    // Pass the hashmap of groups to the fragment
-                    if (groupview != null) {
-                        groupview.updateGroups(groups);
-
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.fragment_group_view, groupview)
-                                .commit();
-                    } else {
-                        Log.d(TAG, "fragment is null");
-                    }
-                } else {
-                    Log.d(TAG, "No such document");
-                }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
-
-         */
-
-
-
     }
 
     @Override
