@@ -13,7 +13,4 @@
         android:orientation="vertical">
     </LinearLayout>
 
-
-
-
 </androidx.core.widget.NestedScrollView>

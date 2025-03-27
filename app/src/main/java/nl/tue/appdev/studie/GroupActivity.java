@@ -1,5 +1,6 @@
 package nl.tue.appdev.studie;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -9,19 +10,32 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.View;
 
 import nl.tue.appdev.studie.databinding.ActivityGroupBinding;
 
 public class GroupActivity extends AppCompatActivity {
 
+    private String TAG = "GroupActivity";
+
     private ActivityGroupBinding binding;
     TabLayout tabLayout;
     ViewPager viewPager;
 
+    String group_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // get group id from home screen intent
+        Intent intent = getIntent();
+        group_id = intent.getStringExtra("id");
+
+        if (group_id != null) {
+            Log.d(TAG, group_id);
+        }
 
         binding = ActivityGroupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
