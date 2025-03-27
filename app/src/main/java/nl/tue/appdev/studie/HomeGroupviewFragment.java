@@ -22,9 +22,13 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import nl.tue.appdev.studie.databinding.FragmentFirstBinding;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class HomeGroupviewFragment extends Fragment {
 
@@ -50,11 +54,21 @@ public class HomeGroupviewFragment extends Fragment {
         // Remove the old set of buttons
         buttonContainer.removeAllViews();
 
+        // Sort groups by name
+        List<String> groupNames = new ArrayList<>(groups.values());
+        groupNames.sort(String.CASE_INSENSITIVE_ORDER);
+
         // Generate a list of buttons for the groups the user has joined
-        for (Map.Entry<String, String> entry : groups.entrySet()) {
+        for (String group_name : groupNames) {
             // Get group ID and name from the entry in the hashmap
-            String group_id = entry.getKey();
-            String group_name = entry.getValue();
+            String key = "default";
+            for (Map.Entry<String, String> item : groups.entrySet()) {
+                if (item.getValue().equals(group_name)) {
+                    key = item.getKey();
+                }
+            }
+            final String groupID = key;
+
 
             // Only show a button if it matches the query
             if (group_name.toLowerCase().contains(query.toLowerCase())) {
@@ -83,7 +97,7 @@ public class HomeGroupviewFragment extends Fragment {
                 button.setOnClickListener(v -> {
                     Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show();
                     Intent toGroup = new Intent(getActivity(), GroupActivity.class);
-                    toGroup.putExtra("id", group_id);
+                    toGroup.putExtra("id", groupID);
                     startActivity(toGroup);
                 });
 
