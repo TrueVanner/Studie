@@ -1,12 +1,12 @@
 package nl.tue.appdev.studie;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -15,17 +15,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.intellij.lang.annotations.RegExp;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.*;
 
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -51,9 +46,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         nameInput = findViewById(R.id.input_name);
         emailInput = findViewById(R.id.signup_input_email);
         passwordInput = findViewById(R.id.signup_input_password);
-        Button signup = findViewById(R.id.button_sign_up);
+        ImageButton signup = (ImageButton) findViewById(R.id.button_sign_up);
+        TextView login = (TextView) findViewById(R.id.hyperlink_to_login);
 
         signup.setOnClickListener(this);
+        login.setOnClickListener(this);
     }
 
     enum UpdateType { BAD_NAME, BAD_PASSWORD, BAD_EMAIL, BAD_AUTH }
@@ -80,6 +77,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
         Intent toHome = new Intent(SignupActivity.this, HomeActivity.class);
+        Intent tologin = new Intent(SignupActivity.this, LoginActivity.class);
         if (id == R.id.button_sign_up) {
             String name = nameInput.getText().toString();
             String email = emailInput.getText().toString();
@@ -126,6 +124,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
+        } else if (id==R.id.hyperlink_to_login){
+            startActivity(tologin);
         } else {
             Toast.makeText(this, "Undefined request", Toast.LENGTH_SHORT).show();
         }

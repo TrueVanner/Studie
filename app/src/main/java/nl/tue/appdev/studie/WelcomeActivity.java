@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -29,8 +30,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         mAuth = FirebaseAuth.getInstance();
 
-        Button login = findViewById(R.id.button_login);
-        Button signup = findViewById(R.id.button_signup);
+        ImageButton login = (ImageButton) findViewById(R.id.button_login);
+        ImageButton signup = (ImageButton) findViewById(R.id.button_signup);
 
         signup.setOnClickListener(this);
         login.setOnClickListener(this);
@@ -49,13 +50,13 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         int id = v.getId();
         Intent toLogin = new Intent(WelcomeActivity.this, LoginActivity.class);
+        Intent toSignup = new Intent(WelcomeActivity.this, SignupActivity.class);
         if (id == R.id.button_login) {
             startActivity(toLogin);
+        } else if (id == R.id.button_signup) {
+            startActivity(toSignup);
         } else {
             String toastText = "Undefined request";
-            if (id == R.id.button_signup) {
-                toastText = "Go to Sign Up";
-            }
             Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }

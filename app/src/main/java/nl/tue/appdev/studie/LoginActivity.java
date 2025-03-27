@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -39,8 +41,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         emailInput = findViewById(R.id.login_input_email);
         passwordInput = findViewById(R.id.login_input_password);
 
-        Button login = findViewById(R.id.button_log_in);
-        Button gotoSignup = findViewById(R.id.button_go_to_signup);
+        ImageButton login = (ImageButton) findViewById(R.id.button_log_in);
+        TextView gotoSignup = (TextView) findViewById(R.id.hyperlink_to_signup);
 
         login.setOnClickListener(this);
         gotoSignup.setOnClickListener(this);
@@ -96,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             updateUI(UpdateType.LOGIN_FAILED);
                         }
                     });
-        } else if (id == R.id.button_go_to_signup) {
+        } else if (id == R.id.hyperlink_to_signup) {
             startActivity(toSignup);
         }
     }
