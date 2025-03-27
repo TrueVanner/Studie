@@ -57,7 +57,7 @@ public class JoinGroupviewFragment extends Fragment {
         // Remove the old set of buttons
         buttonContainer.removeAllViews();
 
-        // Generate a list of buttons for the groups the user has joined
+        // Generate a list of buttons for the groups the user is able to join
         for (Map.Entry<String, String> entry : groups.entrySet()) {
             // Get group ID and name from the entry in the hashmap
             String group_id = entry.getKey();
