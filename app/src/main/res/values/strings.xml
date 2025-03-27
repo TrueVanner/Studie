@@ -69,4 +69,7 @@
     <string name="account_name">Name</string>
     <string name="account_email">E-mail</string>
     <string name="logout">Log Out</string>
+    <string name="title_activity_join">JoinActivity</string>
+
+    <string name="join">Join</string>
 </resources>
