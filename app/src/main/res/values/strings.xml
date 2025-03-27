@@ -61,4 +61,12 @@
     <string name="home_join">Join</string>
 
     <string name="sign_up">Sign up</string>
+
+    <string name="home">Home</string>
+    <string name="home_search">Search groups…</string>
+
+    <string name="account">Account</string>
+    <string name="account_name">Name</string>
+    <string name="account_email">E-mail</string>
+    <string name="logout">Log Out</string>
 </resources>
