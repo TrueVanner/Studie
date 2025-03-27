@@ -34,7 +34,7 @@ public class HomeGroupviewFragment extends Fragment {
 
     private static final String TAG = "HomeGroupviewFragment";
     private FragmentFirstBinding binding;
-    private HashMap<String, String> groups = new HashMap<String, String>();
+    private HashMap<String, String> groups = new HashMap<>();
     private String query = "";
 
     private LinearLayout buttonContainer;
@@ -67,7 +67,7 @@ public class HomeGroupviewFragment extends Fragment {
                     key = item.getKey();
                 }
             }
-            final String groupID = key;
+            final String group_id = key;
 
 
             // Only show a button if it matches the query
@@ -97,7 +97,7 @@ public class HomeGroupviewFragment extends Fragment {
                 button.setOnClickListener(v -> {
                     Toast.makeText(getContext(), group_name, Toast.LENGTH_SHORT).show();
                     Intent toGroup = new Intent(getActivity(), GroupActivity.class);
-                    toGroup.putExtra("id", groupID);
+                    toGroup.putExtra("id", group_id);
                     startActivity(toGroup);
                 });
 
