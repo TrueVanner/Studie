@@ -39,13 +39,14 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth mAuth;
 
     private HashMap<String, String> groups = new HashMap<String, String>(); // ID, name
-
+    private HashMap<String, String> currGroups = new HashMap<>(); // ID, name
     private EditText searchbar;
     private String query;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // TODO refactor code to make less complex
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_join);
@@ -84,6 +85,28 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
+        String userID = user.getUid();
+
+        DocumentReference userRef = db.collection("users").document(userID);
+        userRef.get().addOnCompleteListener(this,task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    Map<String, Object> userDocument = document.getData();
+                    assert userDocument != null;
+                    currGroups = (HashMap<String, String>) userDocument.get("groups");
+                    Log.d(TAG, String.valueOf(currGroups));
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+
         CollectionReference collectionRef = db.collection("groups");
         collectionRef.get().addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
@@ -103,7 +126,7 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
                 // Pass the hashmap of groups to the fragment
                 if (groupview != null) {
                     Log.d(TAG, String.valueOf(groups));
-                    groupview.updateGroups(groups);
+                    groupview.updateGroups(groups, currGroups);
 
                     fragmentManager.beginTransaction()
                             .replace(R.id.fragment_join_view, groupview)

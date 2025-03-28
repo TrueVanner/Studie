@@ -23,11 +23,15 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import nl.tue.appdev.studie.databinding.FragmentFirstBinding;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -36,15 +40,17 @@ public class JoinGroupviewFragment extends Fragment {
     private static final String TAG = "JoinGroupviewFragment";
     private FragmentFirstBinding binding;
 
-    private FirebaseAuth mAuth;
-    private HashMap<String, String> groups = new HashMap<String, String>();
+    private Map<String, String> groups = new HashMap<>();
+    private Map<String, String> currGroups = new HashMap<>();
     private String query = "";
 
     private LinearLayout buttonContainer;
 
-    public void updateGroups(HashMap<String, String> g) {
+    public void updateGroups(Map<String, String> g, Map<String, String> cg) {
         groups = g;
-        Log.d(TAG, String.valueOf(g));
+        currGroups = cg;
+        Log.d(TAG, "All public groups: " + g);
+        Log.d(TAG, "All current groups: " + cg);
     }
 
     public void updateQuery(String q) {
@@ -57,11 +63,35 @@ public class JoinGroupviewFragment extends Fragment {
         // Remove the old set of buttons
         buttonContainer.removeAllViews();
 
-        // Generate a list of buttons for the groups the user is able to join
-        for (Map.Entry<String, String> entry : groups.entrySet()) {
+        // Get user information
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
+        String userID = user.getUid();
+
+        DocumentReference userRef = db.collection("users").document(userID);
+
+        // Sort groups by name
+        ArrayList<String> groupNames = new ArrayList<>(groups.values());
+        groupNames.sort(String.CASE_INSENSITIVE_ORDER);
+
+        for (String name : currGroups.values()) {
+            groupNames.remove(name);
+        }
+
+        // Generate a list of buttons for the groups the user can join
+        for (String group_name : groupNames) {
             // Get group ID and name from the entry in the hashmap
-            String group_id = entry.getKey();
-            String group_name = entry.getValue();
+            String key = "default";
+
+            for (Map.Entry<String, String> item : groups.entrySet()) {
+                if (item.getValue().equals(group_name)) {
+                    key = item.getKey();
+                }
+            }
+            final String group_id = key;
 
             // Only show a button if it matches the query
             if (group_name.toLowerCase().contains(query.toLowerCase())) {
@@ -88,15 +118,6 @@ public class JoinGroupviewFragment extends Fragment {
                 button.setBackground(background);
 
                 button.setOnClickListener(v -> {
-                    mAuth = FirebaseAuth.getInstance();
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    assert user != null;
-                    String userID = user.getUid();
-
-                    DocumentReference userRef = db.collection("users").document(userID);
-
                     // Add the user to the group when the button is clicked
                     userRef.update("groups." + group_id, group_name)
                             .addOnSuccessListener(aVoid -> {

@@ -78,6 +78,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         int id = v.getId();
         Intent toHome = new Intent(SignupActivity.this, HomeActivity.class);
         Intent tologin = new Intent(SignupActivity.this, LoginActivity.class);
+        Log.d(TAG, "test1");
         if (id == R.id.button_sign_up) {
             String name = nameInput.getText().toString();
             String email = emailInput.getText().toString();
@@ -98,7 +99,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+            Log.d(TAG, "test2");
             mAuth.createUserWithEmailAndPassword(email.trim(), password.trim())
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
@@ -110,6 +111,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
                             Map<String, Object> userData = new HashMap<>();
                             userData.put("name", name.trim());
+                            userData.put("groups", new HashMap<>());
                             db.collection("users")
                                     .document(user.getUid())
                                     .set(userData)

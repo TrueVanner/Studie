@@ -8,18 +8,6 @@
     android:background="@drawable/background">
 
     <EditText
-        android:id="@+id/editTextText2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@color/Transparent"
-        android:inputType="text"
-        android:shadowColor="@color/Transparent"
-        app:layout_constraintBottom_toTopOf="@+id/guideline4"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
-
-    <EditText
         android:id="@+id/editTextText5"
         android:layout_width="0dp"
         android:layout_height="0dp"
