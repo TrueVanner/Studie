@@ -64,6 +64,7 @@
 
     <string name="home">Home</string>
     <string name="home_search">Search your groups…</string>
+    <string name="join_search">Search public groups…</string>
 
     <string name="account">Account</string>
     <string name="account_name">Name</string>

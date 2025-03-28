@@ -42,6 +42,7 @@ dependencies {
     // auth
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+
     // firestore
     implementation(libs.firebase.firestore)
 
@@ -61,8 +62,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-
 }
 
 
