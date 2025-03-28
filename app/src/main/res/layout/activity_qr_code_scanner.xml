@@ -1,56 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/qr_code_scanner"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.journeyapps.barcodescanner.DecoratedBarcodeView
         android:id="@+id/zxing_barcode_scanner"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent" />
 
-    </com.journeyapps.barcodescanner.DecoratedBarcodeView>
-
-    <TextView
-        android:id="@+id/camera_perms_warning"
-        android:layout_width="357dp"
-        android:layout_height="77dp"
-        android:text="@string/no_camera_perms"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:translationY="-50dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/zxing_barcode_scanner" />
-
-    <Button
-        android:id="@+id/camera_perms_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/go_to_camera_settings"
-        android:translationY="20dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/zxing_barcode_scanner"
-        app:layout_constraintEnd_toEndOf="@+id/zxing_barcode_scanner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/zxing_barcode_scanner" />
-
-    <Button
-        android:id="@+id/camera_perms_button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Retry"
-        android:translationY="80dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/zxing_barcode_scanner"
-        app:layout_constraintEnd_toEndOf="@+id/zxing_barcode_scanner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/zxing_barcode_scanner" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
