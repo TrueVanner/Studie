@@ -3,11 +3,8 @@
     android:shape="rectangle" >
 
     <!-- fill/color -->
-    <gradient
-        android:startColor="#000508"
-        android:centerColor="#002887"
-        android:endColor="#00CBB7"
-        android:angle="180"/>
+    <solid
+        android:color="@color/black"/>
     <stroke android:width="5px" android:color="#FFFFFF" />
 
     <!-- Control the width and height of the shape -->
