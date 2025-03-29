@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,7 @@ public class ScannerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scanner);
 
-        Button scanButton = findViewById(R.id.scan_button);
+        ImageButton scanButton = findViewById(R.id.scan_button);
         scanButton.setOnClickListener(v -> {
             if (ContextCompat.checkSelfPermission(ScannerActivity.this, Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -31,6 +32,9 @@ public class ScannerActivity extends AppCompatActivity {
                 startScannerActivity();
             }
         });
+
+        ImageButton backButton = findViewById(R.id.scan_back_button);
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void startScannerActivity() {
