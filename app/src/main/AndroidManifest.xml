@@ -66,6 +66,9 @@
         <activity
             android:name=".DisplayQRCodeContentActivity"
             android:exported="true" />
+        <activity
+            android:name=".ScannerActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

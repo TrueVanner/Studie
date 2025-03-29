@@ -57,13 +57,15 @@
         android:background="@android:drawable/editbox_background"
         android:drawableStart="@android:drawable/ic_menu_search"
         android:drawablePadding="16dp"
-        android:gravity="bottom"
         android:hint="@string/home_search"
         android:inputType="text"
         android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/searchbox_hint"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline59"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline11" />
 
     <androidx.fragment.app.FragmentContainerView

@@ -256,7 +256,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/text_box"
         android:ems="10"
-        android:inputType="textPassword"
+        android:inputType="text|textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/guideline37"
         app:layout_constraintEnd_toStartOf="@+id/guideline40"
         app:layout_constraintStart_toStartOf="@+id/guideline28"

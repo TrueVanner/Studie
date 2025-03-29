@@ -1,8 +1,11 @@
 package nl.tue.appdev.studie;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,9 +13,17 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Transaction;
+
 public class QRCodeActivity extends AppCompatActivity {
 
     private ImageView qrCodeImageView;
+    private FirebaseFirestore db;
+    private TextView groupNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,10 +31,38 @@ public class QRCodeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qr_code);
 
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
+        db = FirebaseFirestore.getInstance();
+        groupNameTextView = findViewById(R.id.group_name_text_view);
 
-        // Generate QR code with a static string
-        String staticString = "exampleStaticString";
-        generateQRCode(staticString);
+//        // Generate QR code with a static string
+//        String staticString = "exampleStaticString";
+//        generateQRCode(staticString);
+
+        retrieveGroupUID2AndGenerateQRCode();
+    }
+
+    private void retrieveGroupUID2AndGenerateQRCode() {
+        DocumentReference docRef = db.collection("groups").document("groupUID2");
+        db.runTransaction((Transaction.Function<Void>) transaction -> {
+            DocumentSnapshot snapshot = transaction.get(docRef);
+            if (snapshot.exists()) {
+                String groupName = snapshot.getString("name");
+                if (groupName != null) {
+                    String qrCodeData = "Name: " + groupName;
+                    runOnUiThread(() -> {
+                        generateQRCode(qrCodeData);
+                        groupNameTextView.setText(groupName);
+                    });
+                } else {
+                    Log.e("QRCodeActivity", "Group Name is null");
+                }
+            } else {
+                Log.e("QRCodeActivity", "Document does not exist");
+            }
+            return null;
+        }).addOnFailureListener(e -> {
+            Log.e("QRCodeActivity", "Transaction failed", e);
+        });
     }
 
     private void generateQRCode(String text) {
