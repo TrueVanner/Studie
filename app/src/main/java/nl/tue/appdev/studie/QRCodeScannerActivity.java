@@ -26,12 +26,13 @@ public class QRCodeScannerActivity extends AppCompatActivity {
             @Override
             public void barcodeResult(BarcodeResult result) {
                 String scannedContent = result.getText();
-                Toast.makeText(QRCodeScannerActivity.this, "Scanned: " + scannedContent, Toast.LENGTH_SHORT).show();
+                String groupName = extractGroupName(scannedContent);
+                //Toast.makeText(QRCodeScannerActivity.this, "Scanned: " + scannedContent, Toast.LENGTH_SHORT).show();
                 barcodeView.pause();
 
                 // Start DisplayQRCodeContentActivity with the scanned content
                 Intent intent = new Intent(QRCodeScannerActivity.this, DisplayQRCodeContentActivity.class);
-                intent.putExtra("SCANNED_CONTENT", scannedContent);
+                intent.putExtra("SCANNED_CONTENT", groupName);
                 startActivity(intent);
             }
 
@@ -39,6 +40,13 @@ public class QRCodeScannerActivity extends AppCompatActivity {
             public void possibleResultPoints(List<com.google.zxing.ResultPoint> resultPoints) {
             }
         });
+    }
+
+    private String extractGroupName(String scannedContent) {
+        if (scannedContent.startsWith("Name: ")) {
+            return scannedContent.substring(6).trim();
+        }
+        return scannedContent;
     }
 
     @Override

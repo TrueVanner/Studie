@@ -154,8 +154,7 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
             Intent toHome = new Intent(JoinActivity.this, HomeActivity.class);
             startActivity(toHome);
         } else if (id == R.id.qr_icon_button) {
-            // TODO: update activity im not sure if this is the correct one lol
-            Intent toQR = new Intent(JoinActivity.this, QRCodeActivity.class);
+            Intent toQR = new Intent(JoinActivity.this, ScannerActivity.class);
             startActivity(toQR);
         }
     }
