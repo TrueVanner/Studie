@@ -73,4 +73,7 @@
     <string name="title_activity_join">JoinActivity</string>
 
     <string name="join">Join</string>
+
+    <string name="fc_create">Create</string>
+    <string name="note_upload">Upload</string>
 </resources>
