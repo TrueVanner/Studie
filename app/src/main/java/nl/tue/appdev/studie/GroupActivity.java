@@ -6,12 +6,22 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 import nl.tue.appdev.studie.databinding.ActivityGroupBinding;
 
@@ -24,6 +34,12 @@ public class GroupActivity extends AppCompatActivity {
     ViewPager viewPager;
 
     String group_id;
+
+    private FirebaseAuth mAuth;
+
+    private Map<String, Object> userDocument;
+
+    private Vector<Flashcard> flashcards = new Vector<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +67,10 @@ public class GroupActivity extends AppCompatActivity {
         // set width to screen width
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        GroupPagerAdapter groupPagerAdapter = new GroupPagerAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount());
-        //viewPager = binding.viewPager;
+        GroupPagerAdapter groupPagerAdapter = new GroupPagerAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), group_id);
+        viewPager = binding.viewPager;
         viewPager.setAdapter(groupPagerAdapter);
-        //tabLayout = binding.tabs;
+        tabLayout = binding.tabs;
         tabLayout.setupWithViewPager(viewPager);
         FloatingActionButton fab = binding.fab;
 
@@ -87,5 +103,6 @@ public class GroupActivity extends AppCompatActivity {
                         .setAnchorView(R.id.fab).show();
             }
         });
+
     }
 }

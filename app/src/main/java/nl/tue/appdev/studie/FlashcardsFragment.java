@@ -25,6 +25,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 
 public class FlashcardsFragment extends Fragment {
@@ -35,8 +46,83 @@ public class FlashcardsFragment extends Fragment {
 
     private LinearLayout flashcardContainer;
 
+    private FirebaseAuth mAuth;
+    private Map<String, Object> userDocument;
+    private String group_id;
+    private Vector<String> flashcard_ids = new Vector<>();
+    private Vector<Flashcard> flashcards = new Vector<>();
+
+    public void retrieveFlashcardData() {
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        for (String flashcard_id : flashcard_ids) {
+            // Get flashcard data using the flashcard ID
+            DocumentReference docRef = db.collection("flashcards").document(flashcard_id);
+            docRef.get().addOnCompleteListener(requireActivity(), task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        userDocument = document.getData();
+                        assert userDocument != null;
+                        String question = (String) userDocument.get("question");
+                        String answer = (String) userDocument.get("answer");
+                        String author = (String) userDocument.get("author");
+                        Log.d(TAG,  question + " " + answer + " " + author);
+
+                        Flashcard f = new Flashcard(flashcard_id, question, answer, author);
+                        flashcards.add(f);
+
+                        displayFlashcards();
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            });
+        }
+    }
+
+    public void retrieveFlashcards() {
+        // Clear the list
+        flashcards = new Vector<>();
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get flashcards of the group
+        DocumentReference docRef = db.collection("groups").document(group_id);
+        docRef.get().addOnCompleteListener(requireActivity(), task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    userDocument = document.getData();
+                    assert userDocument != null;
+                    List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
+                    flashcard_ids = new Vector<>(flashcard_ids_list);
+                    Log.d(TAG, String.valueOf(flashcard_ids));
+
+                    retrieveFlashcardData();
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+    }
+
     public void displayFlashcards() {
-        for (int i = 0; i < 20; i++) {
+        flashcardContainer.removeAllViews();
+
+        for (Flashcard f : flashcards) {
+            String id = f.getId();
+            String question = f.getQuestion();
+            String author = f.getAuthor();
+
             // Create a FrameLayout to act as a button container
             FrameLayout buttonContainer = new FrameLayout(getContext());
             buttonContainer.setId(View.generateViewId());
@@ -68,40 +154,40 @@ public class FlashcardsFragment extends Fragment {
                     FrameLayout.LayoutParams.MATCH_PARENT
             ));
 
-            // Left Text (75% width)
-            TextView leftText = new TextView(getContext());
-            leftText.setId(View.generateViewId());
-            leftText.setText("Left Side Text");
-            leftText.setMaxLines(2);
-            leftText.setTextColor(Color.WHITE);
-            leftText.setTextSize(16);
+            // Question text (75% width)
+            TextView questionText = new TextView(getContext());
+            questionText.setId(View.generateViewId());
+            questionText.setText(question);
+            questionText.setMaxLines(2);
+            questionText.setTextColor(Color.WHITE);
+            questionText.setTextSize(16);
 
-            ConstraintLayout.LayoutParams leftTextParams = new ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
-            leftTextParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-            leftTextParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-            leftTextParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
-            leftTextParams.width = 0;
-            leftTextParams.matchConstraintPercentWidth = 0.75f;
-            leftText.setLayoutParams(leftTextParams);
-            leftText.setEllipsize(TextUtils.TruncateAt.END);
+            ConstraintLayout.LayoutParams questionTextParams = new ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            questionTextParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+            questionTextParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+            questionTextParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            questionTextParams.width = 0;
+            questionTextParams.matchConstraintPercentWidth = 0.75f;
+            questionText.setLayoutParams(questionTextParams);
+            questionText.setEllipsize(TextUtils.TruncateAt.END);
 
-            // Right Text (20% width)
-            TextView rightText = new TextView(getContext());
-            rightText.setId(View.generateViewId());
-            rightText.setText("Right Text");
-            rightText.setMaxLines(1);
-            rightText.setTextColor(Color.WHITE);
-            rightText.setTextSize(16);
+            // Author text (20% width)
+            TextView authorText = new TextView(getContext());
+            authorText.setId(View.generateViewId());
+            authorText.setText(author);
+            authorText.setMaxLines(1);
+            authorText.setTextColor(Color.WHITE);
+            authorText.setTextSize(16);
 
-            ConstraintLayout.LayoutParams rightTextParams = new ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
-            rightTextParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
-            rightTextParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
-            rightTextParams.width = 0;
-            rightTextParams.matchConstraintPercentWidth = 0.2f; // 20% of parent width
-            rightText.setLayoutParams(rightTextParams);
-            rightText.setEllipsize(TextUtils.TruncateAt.END);
-            rightText.setGravity(Gravity.END);
-            rightText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
+            ConstraintLayout.LayoutParams authorTextParams = new ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+            authorTextParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+            authorTextParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID;
+            authorTextParams.width = 0;
+            authorTextParams.matchConstraintPercentWidth = 0.2f; // 20% of parent width
+            authorText.setLayoutParams(authorTextParams);
+            authorText.setEllipsize(TextUtils.TruncateAt.END);
+            authorText.setGravity(Gravity.END);
+            authorText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
 
             // Icon (Top-Right Corner)
             ImageView icon = new ImageView(getContext());
@@ -114,8 +200,8 @@ public class FlashcardsFragment extends Fragment {
             icon.setLayoutParams(params);
 
             // Add views to buttonLayout
-            buttonLayout.addView(leftText);
-            buttonLayout.addView(rightText);
+            buttonLayout.addView(questionText);
+            buttonLayout.addView(authorText);
             buttonLayout.addView(icon);
 
             // Add button and layout to FrameLayout
@@ -129,16 +215,16 @@ public class FlashcardsFragment extends Fragment {
             ConstraintSet set = new ConstraintSet();
             set.clone(buttonLayout);
 
-            set.connect(leftText.getId(), ConstraintSet.START, buttonLayout.getId(), ConstraintSet.START, 16);
-            set.connect(leftText.getId(), ConstraintSet.TOP, buttonLayout.getId(), ConstraintSet.TOP, 16);
-            set.connect(leftText.getId(), ConstraintSet.BOTTOM, buttonLayout.getId(), ConstraintSet.BOTTOM, 26);
-            set.constrainWidth(leftText.getId(), 0);
-            set.setHorizontalWeight(leftText.getId(), 0.75f);
+            set.connect(questionText.getId(), ConstraintSet.START, buttonLayout.getId(), ConstraintSet.START, 16);
+            set.connect(questionText.getId(), ConstraintSet.TOP, buttonLayout.getId(), ConstraintSet.TOP, 16);
+            set.connect(questionText.getId(), ConstraintSet.BOTTOM, buttonLayout.getId(), ConstraintSet.BOTTOM, 26);
+            set.constrainWidth(questionText.getId(), 0);
+            set.setHorizontalWeight(questionText.getId(), 0.75f);
 
-            set.connect(rightText.getId(), ConstraintSet.END, buttonLayout.getId(), ConstraintSet.END, 16);
-            set.connect(rightText.getId(), ConstraintSet.BOTTOM, buttonLayout.getId(), ConstraintSet.BOTTOM, 26);
-            set.constrainWidth(rightText.getId(), 0);
-            set.setHorizontalWeight(rightText.getId(), 0.2f);
+            set.connect(authorText.getId(), ConstraintSet.END, buttonLayout.getId(), ConstraintSet.END, 16);
+            set.connect(authorText.getId(), ConstraintSet.BOTTOM, buttonLayout.getId(), ConstraintSet.BOTTOM, 26);
+            set.constrainWidth(authorText.getId(), 0);
+            set.setHorizontalWeight(authorText.getId(), 0.2f);
 
             set.connect(icon.getId(), ConstraintSet.END, buttonLayout.getId(), ConstraintSet.END, 16);
             set.connect(icon.getId(), ConstraintSet.TOP, buttonLayout.getId(), ConstraintSet.TOP, 16);
@@ -147,7 +233,8 @@ public class FlashcardsFragment extends Fragment {
 
             // Set OnClickListener for the FrameLayout
             customButton.setOnClickListener(v -> {
-                Toast.makeText(getContext(), "Button clicked!", Toast.LENGTH_SHORT).show();
+                // TODO: add intent with extra information
+                Toast.makeText(getContext(), "Flashcard " + id + " clicked", Toast.LENGTH_SHORT).show();
             });
         }
     }
@@ -155,6 +242,11 @@ public class FlashcardsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            group_id = getArguments().getString("id");
+            Log.d(TAG, "Received Data: " + group_id);
+        }
     }
 
     @Override
@@ -168,6 +260,6 @@ public class FlashcardsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         flashcardContainer = view.findViewById(R.id.fc_view_container);
-        displayFlashcards();
+        retrieveFlashcards();
     }
 }
