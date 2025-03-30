@@ -10,24 +10,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 public class SignupActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -37,7 +32,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private EditText emailInput;
     private EditText passwordInput;
     private boolean usernameAvailable = true;
-
 
 
     @Override
@@ -56,8 +50,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         nameInput = findViewById(R.id.input_name);
         emailInput = findViewById(R.id.signup_input_email);
         passwordInput = findViewById(R.id.signup_input_password);
-        ImageButton signup = (ImageButton) findViewById(R.id.button_sign_up);
-        TextView login = (TextView) findViewById(R.id.hyperlink_to_login);
+        ImageButton signup = findViewById(R.id.button_sign_up);
+        TextView login = findViewById(R.id.hyperlink_to_login);
 
         signup.setOnClickListener(this);
         login.setOnClickListener(this);
@@ -88,82 +82,97 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void createUser(String email, String password) {
+        mAuth.createUserWithEmailAndPassword(email.trim(), password.trim())
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        Intent toHome = new Intent(SignupActivity.this, HomeActivity.class);
+                        String name = nameInput.getText().toString();
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "createUserWithEmail:success");
+
+                        FirebaseUser user = task.getResult().getUser();
+                        assert user != null;
+
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("name", name.trim());
+                        userData.put("groups", new HashMap<>());
+                        db.collection("users")
+                                .document(user.getUid())
+                                .set(userData)
+                                .addOnSuccessListener(documentReference -> {
+                                    Log.d(TAG, "addUserToFirestore:success");
+                                    startActivity(toHome);
+                                });
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        Toast.makeText(SignupActivity.this, "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void checkUsernameAndCreate() {
+        String name = nameInput.getText().toString();
+        String email = emailInput.getText().toString();
+        String password = passwordInput.getText().toString();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").whereEqualTo("name", name).get()
+                .addOnCompleteListener(this, task -> {
+                    Log.d(TAG, "task succesful");
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d(TAG, document.getId() + " => " + document.getData());
+                            usernameAvailable = false;
+                        }
+
+                        if (usernameAvailable) {
+                            createUser(email, password);
+                        } else {
+                            updateUI(UpdateType.USERNAME_TAKEN);
+                            usernameAvailable = true;
+                        }
+                    } else {
+                        Log.d(TAG, "Query failed");
+                    }
+                });
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        Intent toHome = new Intent(SignupActivity.this, HomeActivity.class);
         Intent tologin = new Intent(SignupActivity.this, LoginActivity.class);
         if (id == R.id.button_sign_up) {
+            // Get user credentials
             String name = nameInput.getText().toString();
             String email = emailInput.getText().toString();
             String password = passwordInput.getText().toString();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             // Check if fields are correct
-            if (name.isBlank()) {
+            if (name.isBlank()) { // name field not filled in
                 updateUI(UpdateType.BAD_NAME);
                 return;
             }
-            if (password.isBlank()) {
+            if (password.isBlank()) { // password field not filled in
                 updateUI((UpdateType.BAD_PASSWORD));
                 return;
             }
-            if(!email.toLowerCase().matches("[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}")) {
+            if(!email.toLowerCase().matches("[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}")) { // email invalid
                 updateUI(UpdateType.BAD_EMAIL);
                 return;
             }
-            if (!password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{10,}$")) {
+            if (!password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{10,}$")) { // password insecure
                 updateUI(UpdateType.INSECURE_PW);
                 return;
             }
 
-            // Check if email and username are already used
-//            db.collection("users").whereEqualTo("name", name).get()
-//                            .addOnCompleteListener(this,task -> {
-//                                if (task.isSuccessful()) {
-//                                    for (QueryDocumentSnapshot document : task.getResult()) {
-//                                        Log.d(TAG, document.getId() + " => " + document.getData());
-//                                        usernameAvailable = false;
-//                                    }
-//                                } else {
-//                                    Log.d(TAG, "Query failed");
-//                                }
-//                            });
-//
-//            if (!usernameAvailable) {
-//                updateUI(UpdateType.USERNAME_TAKEN);
-//                return;
-//            }
+            checkUsernameAndCreate(); // Check if the username is available and create account
 
-            mAuth.createUserWithEmailAndPassword(email.trim(), password.trim())
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-
-                            FirebaseUser user = task.getResult().getUser();
-                            assert user != null;
-
-                            Map<String, Object> userData = new HashMap<>();
-                            userData.put("name", name.trim());
-                            userData.put("groups", new HashMap<>());
-                            db.collection("users")
-                                    .document(user.getUid())
-                                    .set(userData)
-                                    .addOnSuccessListener(documentReference -> {
-                                        Log.d(TAG, "addUserToFirestore:success");
-                                        startActivity(toHome);
-                                    });
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignupActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else if (id==R.id.hyperlink_to_login){
+        } else if (id==R.id.hyperlink_to_login){ // Go to login button pressed
             startActivity(tologin);
-        } else {
+        } else { // Something weird happened
             Toast.makeText(this, "Undefined request", Toast.LENGTH_SHORT).show();
         }
     }

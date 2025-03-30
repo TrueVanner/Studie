@@ -1,5 +1,6 @@
 package nl.tue.appdev.studie;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -261,5 +262,11 @@ public class FlashcardsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         flashcardContainer = view.findViewById(R.id.fc_view_container);
         retrieveFlashcards();
+
+        Button createButton = view.findViewById(R.id.fc_create);
+        createButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), CreateFlashcardActivity.class);
+            startActivity(intent);
+        });
     }
 }

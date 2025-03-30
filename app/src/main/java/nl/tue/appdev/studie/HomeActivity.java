@@ -59,6 +59,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         // Add 'go to account' button
         Button accountButton = findViewById(R.id.home_account);
         accountButton.setOnClickListener(this);
+        //Add 'create group' button
+        Button createButton = findViewById(R.id.home_create);
+        createButton.setOnClickListener(this);
         // Add 'join groups' button
         Button joinButton = findViewById(R.id.home_join);
         joinButton.setOnClickListener(this);
@@ -134,6 +137,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.home_join) {
             Intent toJoin = new Intent(HomeActivity.this, JoinActivity.class);
             startActivity(toJoin);
+        } else if (id == R.id.home_create) {
+            Intent toCreate = new Intent(HomeActivity.this, GroupCreationActivity.class);
+            startActivity(toCreate);
         }
     }
 }
