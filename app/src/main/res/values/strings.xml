@@ -72,6 +72,8 @@
     <string name="logout">Log Out</string>
     <string name="title_activity_join">JoinActivity</string>
 
+    <string name="course_code"><b>Course </b>(optional):</string>
+
     <string name="join">Join</string>
 
     <string name="fc_create">Create</string>

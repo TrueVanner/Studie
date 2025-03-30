@@ -48,6 +48,10 @@
             android:exported="true"
             android:theme="@style/Theme.Studie" />
         <activity
+            android:name=".GroupCreationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Studie" />
+        <activity
             android:name=".JoinActivity"
             android:exported="false"
             android:label="@string/title_activity_join"
