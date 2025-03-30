@@ -78,4 +78,11 @@
 
     <string name="fc_create">Create</string>
     <string name="note_upload">Upload</string>
+
+    <string-array name="spinner_choices">
+        <item>Choose Flashcards Set...</item>
+        <item>Set 1</item>
+        <item>Set 2</item>
+        <item>Set 3</item>
+    </string-array>
 </resources>

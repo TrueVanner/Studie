@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".QRCodeActivity">
+
+<ScrollView
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:fillViewport="true"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="71dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/fc_create_back_button"
+                android:layout_width="40dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="centerInside"
+                android:src="@drawable/back_arrow"
+                android:contentDescription="Back" />
+
+            <TextView
+                android:id="@+id/create_fc_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Create Flashcard"
+                android:textColor="@color/white"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/question_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="23sp"
+                android:text="Question" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <ImageView
+                    android:id="@+id/question_text_box"
+                    android:layout_width="335dp"
+                    android:layout_height="150dp"
+                    app:srcCompat="@drawable/text_box_2" />
+
+                <EditText
+                    android:id="@+id/question_edit_text"
+                    android:layout_width="335dp"
+                    android:layout_height="150dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="top|start"
+                    android:hint="Enter your question..."
+                    android:inputType="textMultiLine"
+                    android:maxLines="5"
+                    android:scrollbars="vertical"
+                    android:overScrollMode="always"
+                    android:padding="10dp"
+                    android:textColor="@color/black" />
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/add_attachment_button_question"
+                android:layout_width="200dp"
+                android:layout_height="40dp"
+                android:backgroundTint="@color/blue_darker"
+                android:textStyle="bold"
+                android:layout_marginTop="5dp"
+                android:text="Add attachment..." />
+
+            <TextView
+                android:id="@+id/answer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="23sp"
+                android:layout_marginTop="15dp"
+                android:text="Answer" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp">
+
+                <ImageView
+                    android:id="@+id/answer_text_box"
+                    android:layout_width="335dp"
+                    android:layout_height="150dp"
+                    app:srcCompat="@drawable/text_box_2" />
+
+                <EditText
+                    android:id="@+id/answer_edit_text"
+                    android:layout_width="335dp"
+                    android:layout_height="150dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="top|start"
+                    android:hint="Enter your answer..."
+                    android:inputType="textMultiLine"
+                    android:maxLines="5"
+                    android:scrollbars="vertical"
+                    android:overScrollMode="always"
+                    android:padding="10dp"
+                    android:textColor="@color/black" />
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/add_attachment_button_answer"
+                android:layout_width="200dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:backgroundTint="@color/blue_darker"
+                android:textStyle="bold"
+                android:text="Add attachment..." />
+
+            <Spinner
+                android:id="@+id/spinner_sets"
+                android:layout_width="300dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="25dp"
+                android:background="@drawable/spinner"
+                android:entries="@array/spinner_choices" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/create_button_frame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="25dp">
+
+            <ImageButton
+                android:id="@+id/create_fc_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create"
+                android:textColor="@color/white"
+                android:textSize="23sp"
+                android:gravity="center"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </LinearLayout>
+
+</ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -73,6 +73,9 @@
         <activity
             android:name=".ScannerActivity"
             android:exported="true" />
+        <activity
+            android:name=".CreateFlashcardActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
