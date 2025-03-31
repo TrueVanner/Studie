@@ -33,7 +33,7 @@ public class GroupActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
 
-    String group_id;
+    String groupId;
 
     private FirebaseAuth mAuth;
 
@@ -47,10 +47,10 @@ public class GroupActivity extends AppCompatActivity {
 
         // get group id from home screen intent
         Intent intent = getIntent();
-        group_id = intent.getStringExtra("id");
+        groupId = intent.getStringExtra("id");
 
-        if (group_id != null) {
-            Log.d(TAG, group_id);
+        if (groupId != null) {
+            Log.d(TAG, groupId);
         }
 
         binding = ActivityGroupBinding.inflate(getLayoutInflater());
@@ -67,12 +67,13 @@ public class GroupActivity extends AppCompatActivity {
         // set width to screen width
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        GroupPagerAdapter groupPagerAdapter = new GroupPagerAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), group_id);
+        GroupPagerAdapter groupPagerAdapter = new GroupPagerAdapter(this, getSupportFragmentManager(), tabLayout.getTabCount(), groupId);
         viewPager = binding.viewPager;
         viewPager.setAdapter(groupPagerAdapter);
         tabLayout = binding.tabs;
         tabLayout.setupWithViewPager(viewPager);
         FloatingActionButton fab = binding.fab;
+        fab.setImageResource(R.drawable.user);
 
         // connect viewpager changes to tab layout
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -98,9 +99,9 @@ public class GroupActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(R.id.fab).show();
+                Intent toManage = new Intent(GroupActivity.this, ManageGroupActivity.class);
+                toManage.putExtra("id", groupId);
+                startActivity(toManage);
             }
         });
 

@@ -79,6 +79,9 @@
     <string name="fc_create">Create</string>
     <string name="note_upload">Upload</string>
 
+    <string name="manage">Manage</string>
+    <string name="show_qr">Show group QR code</string>
+
     <string-array name="spinner_choices">
         <item>Choose Flashcards Set...</item>
         <item>Set 1</item>

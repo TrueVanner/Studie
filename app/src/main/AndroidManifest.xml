@@ -76,6 +76,9 @@
         <activity
             android:name=".CreateFlashcardActivity"
             android:exported="true" />
+        <activity
+            android:name=".ManageGroupActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

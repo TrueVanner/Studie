@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,16 +21,25 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
 
-public class QRCodeActivity extends AppCompatActivity {
+public class QRCodeActivity extends AppCompatActivity implements View.OnClickListener{
 
     private ImageView qrCodeImageView;
     private FirebaseFirestore db;
     private TextView groupNameTextView;
+    private String groupId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_code);
+
+        // get group id from group screen intent
+        Intent intent = getIntent();
+        groupId = intent.getStringExtra("id");
+
+        // Add back button
+        ImageButton back = findViewById(R.id.qr_code_back_button);
+        back.setOnClickListener(this);
 
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
         db = FirebaseFirestore.getInstance();
@@ -39,6 +50,16 @@ public class QRCodeActivity extends AppCompatActivity {
 //        generateQRCode(staticString);
 
         retrieveGroupUID2AndGenerateQRCode();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.qr_code_back_button) {
+            Intent toManage = new Intent(QRCodeActivity.this, ManageGroupActivity.class);
+            toManage.putExtra("id", groupId);
+            startActivity(toManage);
+        }
     }
 
     private void retrieveGroupUID2AndGenerateQRCode() {
