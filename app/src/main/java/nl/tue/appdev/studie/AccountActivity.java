@@ -25,13 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AccountActivity extends AppCompatActivity implements View.OnClickListener {
-
+    //SonarQube is crying over the TAG declaration, but I think this looks better
     private String TAG = "AccountActivity";
 
     private FirebaseAuth mAuth;
-    private FirebaseUser user;
 
-    private String name, email;
+    private String name;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +57,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Update name view
+        FirebaseUser user;
         user = mAuth.getCurrentUser();
         assert user != null;
         String userID = user.getUid();
@@ -79,8 +80,8 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
                 Log.d(TAG, "get failed with ", task.getException());
             }
         });
-
         // Update email view
+        String email;
         email = user.getEmail();
         emailView.setText(email);
 

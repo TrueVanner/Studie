@@ -1,7 +1,8 @@
 package nl.tue.appdev.studie;
 
 public class Groups {
-    private String name, code;
+    private String name;
+    private String code;
     private boolean isPublic;
 
     public Groups(){
