@@ -2,6 +2,7 @@ package nl.tue.appdev.studie;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -162,6 +163,7 @@ public class FlashcardsFragment extends Fragment {
             questionText.setMaxLines(2);
             questionText.setTextColor(Color.WHITE);
             questionText.setTextSize(16);
+            questionText.setTypeface(null, Typeface.BOLD);
 
             ConstraintLayout.LayoutParams questionTextParams = new ConstraintLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
             questionTextParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
