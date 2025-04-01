@@ -27,12 +27,13 @@ public class QRCodeScannerActivity extends AppCompatActivity {
             public void barcodeResult(BarcodeResult result) {
                 String scannedContent = result.getText();
                 String groupName = extractGroupName(scannedContent);
-                //Toast.makeText(QRCodeScannerActivity.this, "Scanned: " + scannedContent, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(QRCodeScannerActivity.this, "Scanned Group Name: " + groupName, Toast.LENGTH_SHORT).show();
+
                 barcodeView.pause();
 
                 // Start DisplayQRCodeContentActivity with the scanned content
                 Intent intent = new Intent(QRCodeScannerActivity.this, DisplayQRCodeContentActivity.class);
-                intent.putExtra("SCANNED_CONTENT", groupName);
+                intent.putExtra("SCANNED_CONTENT", scannedContent);
                 startActivity(intent);
             }
 
@@ -44,7 +45,8 @@ public class QRCodeScannerActivity extends AppCompatActivity {
 
     private String extractGroupName(String scannedContent) {
         if (scannedContent.startsWith("Name: ")) {
-            return scannedContent.substring(6).trim();
+            String[] parts = scannedContent.split(", ID: ");
+            return parts[0].substring(6).trim();
         }
         return scannedContent;
     }
