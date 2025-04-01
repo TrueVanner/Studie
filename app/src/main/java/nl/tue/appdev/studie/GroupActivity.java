@@ -73,8 +73,8 @@ public class GroupActivity extends AppCompatActivity {
         viewPager.setAdapter(groupPagerAdapter);
         tabLayout = binding.tabs;
         tabLayout.setupWithViewPager(viewPager);
-        FloatingActionButton fab = binding.fab;
-        fab.setImageResource(R.drawable.user);
+        FloatingActionButton manage_fab = binding.manageFab;
+        FloatingActionButton back_fab = binding.backFab;
 
         // connect viewpager changes to tab layout
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -97,12 +97,19 @@ public class GroupActivity extends AppCompatActivity {
             }
         });
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        manage_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent toManage = new Intent(GroupActivity.this, ManageGroupActivity.class);
                 toManage.putExtra("id", groupId);
                 startActivity(toManage);
+            }
+        });
+        back_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toHome = new Intent(GroupActivity.this, HomeActivity.class);
+                startActivity(toHome);
             }
         });
 

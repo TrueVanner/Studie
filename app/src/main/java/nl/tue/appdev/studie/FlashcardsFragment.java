@@ -34,7 +34,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +50,9 @@ public class FlashcardsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
-    private String group_id;
-    private ArrayList<String> flashcard_ids = new ArrayList<>();
-    private ArrayList<Flashcard> flashcards = new ArrayList<>();
+    private String groupId;
+    private Vector<String> flashcard_ids = new Vector<>();
+    private Vector<Flashcard> flashcards = new Vector<>();
 
     public void retrieveFlashcardData() {
         mAuth = FirebaseAuth.getInstance();
@@ -90,13 +89,13 @@ public class FlashcardsFragment extends Fragment {
 
     public void retrieveFlashcards() {
         // Clear the list
-        flashcards = new ArrayList<>();
+        flashcards = new Vector<>();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Get flashcards of the group
-        DocumentReference docRef = db.collection("groups").document(group_id);
+        DocumentReference docRef = db.collection("groups").document(groupId);
         docRef.get().addOnCompleteListener(requireActivity(), task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -105,7 +104,7 @@ public class FlashcardsFragment extends Fragment {
                     userDocument = document.getData();
                     assert userDocument != null;
                     List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
-                    flashcard_ids = new ArrayList<>(flashcard_ids_list);
+                    flashcard_ids = new Vector<>(flashcard_ids_list);
                     Log.d(TAG, String.valueOf(flashcard_ids));
 
                     retrieveFlashcardData();
@@ -248,8 +247,8 @@ public class FlashcardsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            group_id = getArguments().getString("id");
-            Log.d(TAG, "Received Data: " + group_id);
+            groupId = getArguments().getString("id");
+            Log.d(TAG, "Received Data: " + groupId);
         }
     }
 
@@ -268,8 +267,9 @@ public class FlashcardsFragment extends Fragment {
 
         Button createButton = view.findViewById(R.id.fc_create);
         createButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), CreateFlashcardActivity.class);
-            startActivity(intent);
+            Intent toCreate = new Intent(getActivity(), CreateFlashcardActivity.class);
+            toCreate.putExtra("id", groupId);
+            startActivity(toCreate);
         });
     }
 }

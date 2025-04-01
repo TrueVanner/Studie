@@ -33,7 +33,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Source;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -48,10 +47,10 @@ public class SetsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
-    private String group_id;
-    private ArrayList<String> flashcardset_ids = new ArrayList<>();
-    private ArrayList<String> flashcard_ids = new ArrayList<>();
-    private ArrayList<Flashcardset> flashcardsets = new ArrayList<>();
+    private String groupId;
+    private Vector<String> flashcardset_ids = new Vector<>();
+    private Vector<String> flashcard_ids = new Vector<>();
+    private Vector<Flashcardset> flashcardsets = new Vector<>();
 
     public void retrieveFlashcardsetData() {
         mAuth = FirebaseAuth.getInstance();
@@ -69,7 +68,7 @@ public class SetsFragment extends Fragment {
                         assert userDocument != null;
                         String title = (String) userDocument.get("title");
                         List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
-                        flashcard_ids = new ArrayList<>(flashcard_ids_list);
+                        flashcard_ids = new Vector<>(flashcard_ids_list);
                         String author = (String) userDocument.get("author");
                         Log.d(TAG,  title + " " + flashcard_ids + " " + author);
 
@@ -89,13 +88,13 @@ public class SetsFragment extends Fragment {
 
     public void retrieveFlashcardsets() {
         // Clear the list
-        flashcardsets = new ArrayList<>();
+        flashcardsets = new Vector<>();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Get flashcards of the group
-        DocumentReference docRef = db.collection("groups").document(group_id);
+        DocumentReference docRef = db.collection("groups").document(groupId);
         docRef.get(Source.SERVER).addOnCompleteListener(requireActivity(), task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -104,7 +103,7 @@ public class SetsFragment extends Fragment {
                     userDocument = document.getData();
                     assert userDocument != null;
                     List<String> flashcardset_ids_list = (List<String>) userDocument.get("flashcardsets");
-                    flashcardset_ids = new ArrayList<>(flashcardset_ids_list);
+                    flashcardset_ids = new Vector<>(flashcardset_ids_list);
                     Log.d(TAG, String.valueOf(flashcardset_ids));
 
                     retrieveFlashcardsetData();
@@ -247,8 +246,8 @@ public class SetsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            group_id = getArguments().getString("id");
-            Log.d(TAG, "Received Data: " + group_id);
+            groupId = getArguments().getString("id");
+            Log.d(TAG, "Received Data: " + groupId);
         }
     }
 
@@ -269,8 +268,9 @@ public class SetsFragment extends Fragment {
         //TODO: add intent to flashcardset create screen
         /*
         createButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), CreateFlashcardActivity.class);
-            startActivity(intent);
+            Intent toCreate = new Intent(getActivity(), CreateFlashcardActivity.class);
+            toCreate.putExtra("id", groupId);
+            startActivity(toCreate);
         });
 
          */

@@ -26,7 +26,7 @@
         android:id="@+id/group_name_manage_screen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="REPLACE"
+        android:text=""
         android:textColor="@color/white"
         android:textSize="30sp"
         android:layout_margin="0dp"
