@@ -1,9 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 //    id("com.android.application") version "8.1.4" apply false
     id("org.sonarqube") version "6.0.1.5171"
     id("jacoco")
     alias(libs.plugins.google.gms.google.services)
+
 }
 
 android {
@@ -11,6 +15,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        android.buildFeatures.buildConfig = true
         applicationId = "nl.tue.appdev.studie"
         minSdk = 24
         targetSdk = 35
@@ -18,6 +23,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val credentialsProperties = Properties()
+        credentialsProperties.load(FileInputStream(rootProject.file("credentials.properties")))
+
+        buildConfigField("String", "FTP_HOSTNAME", credentialsProperties.getProperty("FTP_HOSTNAME"))
+        buildConfigField("String", "FTP_USERNAME", credentialsProperties.getProperty("FTP_USERNAME"))
+        buildConfigField("String", "FTP_PASSWORD", credentialsProperties.getProperty("FTP_PASSWORD"))
     }
 
     buildTypes {
@@ -39,6 +51,10 @@ android {
 }
 
 dependencies {
+    // connection with file server
+    implementation(libs.commons.net)
+//    implementation(libs.android.pdf.viewer)
+
     // auth
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)

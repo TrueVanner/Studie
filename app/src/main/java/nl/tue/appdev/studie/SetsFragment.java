@@ -1,17 +1,9 @@
 package nl.tue.appdev.studie;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,17 +17,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Source;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class SetsFragment extends Fragment {
 
@@ -48,9 +45,9 @@ public class SetsFragment extends Fragment {
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
     private String groupId;
-    private Vector<String> flashcardset_ids = new Vector<>();
-    private Vector<String> flashcard_ids = new Vector<>();
-    private Vector<Flashcardset> flashcardsets = new Vector<>();
+    private ArrayList<String> flashcardset_ids = new ArrayList<>();
+    private ArrayList<String> flashcard_ids = new ArrayList<>();
+    private ArrayList<Flashcardset> flashcardsets = new ArrayList<>();
 
     public void retrieveFlashcardsetData() {
         mAuth = FirebaseAuth.getInstance();
@@ -68,7 +65,7 @@ public class SetsFragment extends Fragment {
                         assert userDocument != null;
                         String title = (String) userDocument.get("title");
                         List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
-                        flashcard_ids = new Vector<>(flashcard_ids_list);
+                        flashcard_ids = new ArrayList<>(flashcard_ids_list);
                         String author = (String) userDocument.get("author");
                         Log.d(TAG,  title + " " + flashcard_ids + " " + author);
 
@@ -88,7 +85,7 @@ public class SetsFragment extends Fragment {
 
     public void retrieveFlashcardsets() {
         // Clear the list
-        flashcardsets = new Vector<>();
+        flashcardsets = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -103,7 +100,7 @@ public class SetsFragment extends Fragment {
                     userDocument = document.getData();
                     assert userDocument != null;
                     List<String> flashcardset_ids_list = (List<String>) userDocument.get("flashcardsets");
-                    flashcardset_ids = new Vector<>(flashcardset_ids_list);
+                    flashcardset_ids = new ArrayList<>(flashcardset_ids_list);
                     Log.d(TAG, String.valueOf(flashcardset_ids));
 
                     retrieveFlashcardsetData();
@@ -122,7 +119,7 @@ public class SetsFragment extends Fragment {
         for (Flashcardset s : flashcardsets) {
             String id = s.getId();
             String title = s.getTitle();
-            String size = String.valueOf(s.getSize()) + " Qs.";
+            String size = s.getSize() + " Qs.";
 
             // Create a FrameLayout to act as a button container
             FrameLayout buttonContainer = new FrameLayout(getContext());

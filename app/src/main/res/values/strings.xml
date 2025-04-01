@@ -15,6 +15,9 @@
     <string name="sign_up_hyperlink">Not a member yet? <font color='#25A7F2'>Sign up!</font></string>
     <string name="log_in_hyperlink">Already have an account? <font color='#25A7F2'>Log in!</font></string>
     <string name="login_message"><font size="50"><b>Login</b> \n</font><font size="20">Sign in to continue</font></string>
+    <string name="upload">Upload</string>
+    <string name="upload_notes">Upload Notes</string>
+    <string name="select_file_hint">Select file to upload!</string>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus

@@ -1,17 +1,9 @@
 package nl.tue.appdev.studie;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,15 +17,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 public class NotesFragment extends Fragment {
@@ -47,8 +45,8 @@ public class NotesFragment extends Fragment {
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
     private String groupId;
-    private Vector<String> note_filenames = new Vector<>();
-    private Vector<Note> notes = new Vector<>();
+    private ArrayList<String> note_filenames = new ArrayList<>();
+    private ArrayList<Note> notes = new ArrayList<>();
 
     public void retrieveNoteData() {
         for (String filename : note_filenames) {
@@ -56,7 +54,8 @@ public class NotesFragment extends Fragment {
             String noteId = "a";
             String title = filename;
             String author = "test_user";
-            Note n = new Note(noteId, title, author);
+            String groupId = "groupUID1";
+            Note n = new Note(noteId, title, author, groupId);
             notes.add(n);
         }
 
@@ -65,7 +64,7 @@ public class NotesFragment extends Fragment {
 
     public void retrieveNotes() {
         // Clear the list
-        notes = new Vector<>();
+        notes = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -80,7 +79,7 @@ public class NotesFragment extends Fragment {
                     userDocument = document.getData();
                     assert userDocument != null;
                     List<String> note_filenames_list = (List<String>) userDocument.get("notes");
-                    note_filenames = new Vector<>(note_filenames_list);
+                    note_filenames = new ArrayList<>(note_filenames_list);
                     Log.d(TAG, String.valueOf(note_filenames));
 
                     retrieveNoteData();
@@ -97,7 +96,7 @@ public class NotesFragment extends Fragment {
         noteContainer.removeAllViews();
 
         for (Note n : notes) {
-            String id = n.getId();
+            String id = n.getFilename();
             String title = n.getTitle();
             String author = n.getAuthor();
 

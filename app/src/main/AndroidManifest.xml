@@ -79,6 +79,9 @@
         <activity
             android:name=".ManageGroupActivity"
             android:exported="true" />
+        <activity
+            android:name=".UploadNotesActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -3,7 +3,6 @@ package nl.tue.appdev.studie;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -30,8 +29,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         mAuth = FirebaseAuth.getInstance();
 
-        ImageButton login = (ImageButton) findViewById(R.id.button_login);
-        ImageButton signup = (ImageButton) findViewById(R.id.button_signup);
+        ImageButton login = findViewById(R.id.button_login);
+        ImageButton signup = findViewById(R.id.button_signup);
 
         signup.setOnClickListener(this);
         login.setOnClickListener(this);

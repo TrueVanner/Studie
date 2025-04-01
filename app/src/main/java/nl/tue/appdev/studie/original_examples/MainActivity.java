@@ -1,41 +1,23 @@
-package nl.tue.appdev.studie;
+package nl.tue.appdev.studie.original_examples;
 
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.view.View;
-
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import nl.tue.appdev.studie.databinding.ActivityMainBinding;
-
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import nl.tue.appdev.studie.R;
+import nl.tue.appdev.studie.databinding.ActivityMainBinding;
 // bunch of imports we might need later
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.PopupWindow;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 
 public class MainActivity extends AppCompatActivity {

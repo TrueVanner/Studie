@@ -5,14 +5,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,18 +18,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Source;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 public class FlashcardsFragment extends Fragment {
@@ -51,8 +46,8 @@ public class FlashcardsFragment extends Fragment {
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
     private String groupId;
-    private Vector<String> flashcard_ids = new Vector<>();
-    private Vector<Flashcard> flashcards = new Vector<>();
+    private ArrayList<String> flashcard_ids = new ArrayList<>();
+    private ArrayList<Flashcard> flashcards = new ArrayList<>();
 
     public void retrieveFlashcardData() {
         mAuth = FirebaseAuth.getInstance();
@@ -89,7 +84,7 @@ public class FlashcardsFragment extends Fragment {
 
     public void retrieveFlashcards() {
         // Clear the list
-        flashcards = new Vector<>();
+        flashcards = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -104,7 +99,7 @@ public class FlashcardsFragment extends Fragment {
                     userDocument = document.getData();
                     assert userDocument != null;
                     List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
-                    flashcard_ids = new Vector<>(flashcard_ids_list);
+                    flashcard_ids = new ArrayList<>(flashcard_ids_list);
                     Log.d(TAG, String.valueOf(flashcard_ids));
 
                     retrieveFlashcardData();

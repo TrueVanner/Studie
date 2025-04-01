@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_upload_notes"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".JoinActivity">
+
+    <TextView
+        android:id="@+id/upload_notes_note_title_descr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="Title:"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/upload_notes_note_title"
+        app:layout_constraintEnd_toEndOf="@+id/upload_notes_note_title"
+        app:layout_constraintStart_toStartOf="@+id/upload_notes_note_title" />
+
+    <TextView
+        android:id="@+id/upload_notes_select_file_hint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/select_file_hint"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/select_file_button"
+        app:layout_constraintStart_toStartOf="@+id/select_file_button"
+        app:layout_constraintTop_toBottomOf="@+id/select_file_button" />
+
+    <EditText
+        android:id="@+id/upload_notes_note_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/text_box"
+        android:ems="10"
+        android:inputType="textShortMessage"
+        app:layout_constraintBottom_toTopOf="@+id/select_file_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.894" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/upload_file_button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/button_simple"
+        android:text="@string/upload"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/guideline57"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/upload_notes_select_file_hint" />
+
+    <ProgressBar
+        android:id="@+id/upload_notes_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/upload_file_button" />
+
+    <TextView
+        android:id="@+id/upload_notes_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Upload notes"
+        android:textColor="@color/white"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.974"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/upload_notes_back_button"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="36dp"
+        android:adjustViewBounds="true"
+        android:background="?attr/selectableItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/back_arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/select_file_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/Transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.509"
+        app:srcCompat="@drawable/upload_icon" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
