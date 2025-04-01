@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -39,7 +40,7 @@ public class GroupActivity extends AppCompatActivity {
 
     private Map<String, Object> userDocument;
 
-    private Vector<Flashcard> flashcards = new Vector<>();
+    private ArrayList<Flashcard> flashcards = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

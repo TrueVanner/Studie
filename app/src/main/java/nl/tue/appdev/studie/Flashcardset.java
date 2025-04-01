@@ -1,17 +1,17 @@
 package nl.tue.appdev.studie;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class Flashcardset {
-
     private String id;
     private String title;
-    private Vector<String> flashcardsIds = new Vector<>();
+    private ArrayList<String> flashcardsIds = new ArrayList<>();
     private String author;
 
     public Flashcardset(String id,
                         String title,
-                        Vector<String> flashcardsIds,
+                        ArrayList<String> flashcardsIds,
                         String author) {
         this.id = id;
         this.title = title;
@@ -27,7 +27,7 @@ public class Flashcardset {
         return title;
     }
 
-    public Vector<String> getFlashcardIds() {
+    public ArrayList<String> getFlashcardIds() {
         return flashcardsIds;
     }
 

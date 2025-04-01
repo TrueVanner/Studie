@@ -34,6 +34,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,8 @@ public class FlashcardsFragment extends Fragment {
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
     private String group_id;
-    private Vector<String> flashcard_ids = new Vector<>();
-    private Vector<Flashcard> flashcards = new Vector<>();
+    private ArrayList<String> flashcard_ids = new ArrayList<>();
+    private ArrayList<Flashcard> flashcards = new ArrayList<>();
 
     public void retrieveFlashcardData() {
         mAuth = FirebaseAuth.getInstance();
@@ -89,7 +90,7 @@ public class FlashcardsFragment extends Fragment {
 
     public void retrieveFlashcards() {
         // Clear the list
-        flashcards = new Vector<>();
+        flashcards = new ArrayList<>();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -104,7 +105,7 @@ public class FlashcardsFragment extends Fragment {
                     userDocument = document.getData();
                     assert userDocument != null;
                     List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
-                    flashcard_ids = new Vector<>(flashcard_ids_list);
+                    flashcard_ids = new ArrayList<>(flashcard_ids_list);
                     Log.d(TAG, String.valueOf(flashcard_ids));
 
                     retrieveFlashcardData();
