@@ -50,7 +50,7 @@ public class FlashcardsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private Map<String, Object> userDocument;
-    private String group_id;
+    private String groupId;
     private Vector<String> flashcard_ids = new Vector<>();
     private Vector<Flashcard> flashcards = new Vector<>();
 
@@ -95,7 +95,7 @@ public class FlashcardsFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Get flashcards of the group
-        DocumentReference docRef = db.collection("groups").document(group_id);
+        DocumentReference docRef = db.collection("groups").document(groupId);
         docRef.get().addOnCompleteListener(requireActivity(), task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -247,8 +247,8 @@ public class FlashcardsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            group_id = getArguments().getString("id");
-            Log.d(TAG, "Received Data: " + group_id);
+            groupId = getArguments().getString("id");
+            Log.d(TAG, "Received Data: " + groupId);
         }
     }
 
@@ -267,8 +267,9 @@ public class FlashcardsFragment extends Fragment {
 
         Button createButton = view.findViewById(R.id.fc_create);
         createButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), CreateFlashcardActivity.class);
-            startActivity(intent);
+            Intent toCreate = new Intent(getActivity(), CreateFlashcardActivity.class);
+            toCreate.putExtra("id", groupId);
+            startActivity(toCreate);
         });
     }
 }
