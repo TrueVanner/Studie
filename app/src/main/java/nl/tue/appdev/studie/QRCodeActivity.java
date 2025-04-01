@@ -63,13 +63,13 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void retrieveGroupUID2AndGenerateQRCode() {
-        DocumentReference docRef = db.collection("groups").document("groupUID2");
+        DocumentReference docRef = db.collection("groups").document(groupId);
         db.runTransaction((Transaction.Function<Void>) transaction -> {
             DocumentSnapshot snapshot = transaction.get(docRef);
             if (snapshot.exists()) {
                 String groupName = snapshot.getString("name");
                 if (groupName != null) {
-                    String qrCodeData = "Name: " + groupName;
+                    String qrCodeData = "Name: " + groupName + ", ID: " + groupId;
                     runOnUiThread(() -> {
                         generateQRCode(qrCodeData);
                         groupNameTextView.setText(groupName);
