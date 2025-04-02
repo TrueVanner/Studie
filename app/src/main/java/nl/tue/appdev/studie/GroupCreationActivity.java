@@ -16,9 +16,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
 
 public class GroupCreationActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
     private static final String TAG = "GroupCreationActivity";
@@ -26,9 +33,15 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     private ToggleButton togglePublic;
     private EditText groupName;
     private EditText groupCode;
-    private FirebaseFirestore db;
+    private ArrayList<Flashcard> flashcards = new ArrayList<>();
+    private FirebaseFirestore db=FirebaseFirestore.getInstance();
     private boolean groupnameAvailable = true;
-    
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser user = mAuth.getCurrentUser();
+    String userID = user.getUid();
+    DocumentReference userRef = db.collection("users").document(userID);
+    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference();
+    String groupId=databaseReference.push().getKey();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +54,6 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
             return insets;
         });
 
-        db = FirebaseFirestore.getInstance();
 
         groupName=findViewById(R.id.group_name);
         groupCode =findViewById(R.id.group_course_code);
@@ -116,7 +128,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     }
 
     private void addDataToFirestore(String name, String code, boolean isPublic){
-        Intent toGroup = new Intent(GroupCreationActivity.this, HomeActivity.class);
+        Intent toGroup = new Intent(GroupCreationActivity.this, GroupActivity.class);
         CollectionReference dbGroups = db.collection("groups");
 
         Groups groups = new Groups(name, code, isPublic);
@@ -124,6 +136,8 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
         dbGroups.add(groups).addOnSuccessListener(documentReference -> {
                 Toast.makeText(GroupCreationActivity.this, "Group created successfully!",
                 Toast.LENGTH_SHORT).show();
+                userRef.update("groups." + groupId, name);
+                toGroup.putExtra("id", groupId);
                 startActivity(toGroup);
         });
     }
