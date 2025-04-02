@@ -35,6 +35,7 @@ public class QRCodeScannerActivity extends AppCompatActivity {
                 Intent intent = new Intent(QRCodeScannerActivity.this, DisplayQRCodeContentActivity.class);
                 intent.putExtra("SCANNED_CONTENT", scannedContent);
                 startActivity(intent);
+                finish();
             }
 
             @Override

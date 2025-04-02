@@ -48,8 +48,7 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
         }
 
         backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DisplayQRCodeContentActivity.this, ScannerActivity.class);
-            startActivity(intent);
+            finish();
         });
 
         noButton.setOnClickListener(v -> {
