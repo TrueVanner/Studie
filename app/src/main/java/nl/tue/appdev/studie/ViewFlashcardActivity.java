@@ -16,6 +16,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+/**
+ * Activity to view and interact with a flashcard.
+ * Allows flipping between the question and answer.
+ */
 public class ViewFlashcardActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ViewFlashcardActivity";
@@ -64,6 +68,11 @@ public class ViewFlashcardActivity extends AppCompatActivity implements View.OnC
 
     }
 
+    /**
+     * Loads flashcard data from the database based on the given flashcard ID.
+     *
+     * @param flashcardId The ID of the flashcard to be loaded.
+     */
     private void loadFlashcardData(String flashcardId) {
         DatabaseReference flashcardRef = FirebaseDatabase.getInstance().getReference("flashcards").child(flashcardId);
         Log.e(TAG, "datadatadatadatadatadatadatadatadatadatadatadatadatadatadata");
@@ -89,6 +98,9 @@ public class ViewFlashcardActivity extends AppCompatActivity implements View.OnC
         });
     }
 
+    /**
+     * TESTING: A test method to create a local flashcard to display in the activity fragment.
+     */
     private void createTestFlashcard() {
         String testFlashcardId = "test_fc_1";
         String testQuestionText = "Test Question?";
@@ -99,6 +111,9 @@ public class ViewFlashcardActivity extends AppCompatActivity implements View.OnC
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_flashcard, flashcardFragment).commit();
     }
 
+    /**
+     * Flips the flashcard between the question and answer viewports.
+     */
     private void flipFlashcard() {
         FlashcardFragment flashcardFragment = (FlashcardFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_flashcard);
         isShowingQuestion = !isShowingQuestion;
@@ -112,6 +127,11 @@ public class ViewFlashcardActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+    /**
+     * Handles click events for the flip and back buttons.
+     *
+     * @param v The view that was clicked.
+     */
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fc_view_flip_button) {

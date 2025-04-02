@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Activity for creating a flashcard set of chosen flashcards within a specific group.
+ */
 public class CreateFlashcardSetActivity extends AppCompatActivity {
 
     private String groupId;
@@ -80,6 +83,9 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Loads the flashcards associated with the group from the database.
+     */
     private void loadFlashcards() {
         groupFlashcardsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -101,6 +107,9 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates a new flashcard set with the selected flashcards, storing it both globally and within the group fields.
+     */
     private void createFlashcardSet() {
         String setName = setNameInput.getText().toString().trim();
         if (setName.isEmpty()) {

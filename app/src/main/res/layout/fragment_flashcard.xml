@@ -20,9 +20,12 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="20dp"
-            android:text="Flashcard content"
+            android:text="Flashcard Content"
             android:textColor="@color/white"
-            android:textSize="34sp" />
+            android:textSize="34sp"
+            app:autoSizeMaxTextSize="34sp"
+            app:autoSizeMinTextSize="14sp"
+            app:autoSizeTextType="uniform" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter for selecting flashcards within the Flashcard Set Creation RecyclerView.
+ */
 public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelectAdapter.ViewHolder> {
 
     private final List<Flashcard> flashcardList;
@@ -55,6 +58,9 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
         return selectedFlashcards;
     }
 
+    /**
+     * ViewHolder for flashcard items.
+     */
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView questionTextView;
         CheckBox checkBox;

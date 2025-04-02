@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Activity to view and interact with a flashcard set. Allows browsing through flashcards in the set and flipping between the question and answer of the selected flashcard.
+ */
 public class ViewFlashcardSetActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ViewFlashcardSetActivity";
@@ -77,6 +80,10 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         loadFlashcard(currentFlashcardIndex);
     }
 
+    /**
+     * Loads the flashcards from the flashcard set with given flashcardSetId included in the intent entry.
+     * @param flashcardSetId passed down flashcard set id with the intent, to fetch from the database
+     */
     private void loadFlashcardSet(String flashcardSetId) {
         DatabaseReference flashcardSetRef = FirebaseDatabase.getInstance().getReference("flashcard_sets").child(flashcardSetId);
 
@@ -105,6 +112,10 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         });
     }
 
+    /**
+     * Loads the flashcard upon the flashcard view fragment, based on passed argument of selected flashcard index in the set.
+     * @param index selected flashcard index from the set
+     */
     private void loadFlashcard(int index) {
         if (index >= 0 && index < flashcards.size()) {
             Flashcard currentFlashcard = flashcards.get(index);
@@ -117,6 +128,9 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         }
     }
 
+    /**
+     * TESTING: A test method to create a local flashcard set to display in the activity fragment.
+     */
     private void createTestFlashcardSet() {
         Flashcard flashcard1 = new Flashcard("test_flashcard_1", "Hotel?", "Trivago.", "a1");
         Flashcard flashcard2 = new Flashcard("test_flashcard_2", "q2", "a2", "a2");
@@ -130,6 +144,9 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         updateQuestionNr();
     }
 
+    /**
+     * In the interval of the flashcard set size, switches to the (if existing) previous flashcard in the set and loads it on the activity.
+     */
     private void goToPreviousFlashcard() {
         if (currentFlashcardIndex > 0) {
             currentFlashcardIndex--;
@@ -137,6 +154,9 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         }
     }
 
+    /**
+     * In the interval of the flashcard set size, switches to the (if existing) next flashcard in the set and loads it on the activity.
+     */
     private void goToNextFlashcard() {
         if (currentFlashcardIndex < flashcards.size() - 1) {
             currentFlashcardIndex++;
@@ -144,6 +164,10 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         }
     }
 
+    /**
+     * Switches between the currently viewed flashcard's question viewport and answer viewport.
+     * (isShowingQuestion does not retain between different flashcards in the set, resetting to 'true' when switched)
+     */
     private void flipFlashcard() {
         FlashcardFragment flashcardFragment = (FlashcardFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_flashcard_view_fc_set);
         isShowingQuestion = !isShowingQuestion;
@@ -157,6 +181,9 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         }
     }
 
+    /**
+     * Updates the flashcard number display within the flashcard set view and resets the flashcard state viewport (back to question).
+     */
     private void updateQuestionNr() {
         questionNrTextView.setText("Card " + (currentFlashcardIndex + 1) + " of " + flashcards.size());
         flashcardStateTextView.setText("Question");
