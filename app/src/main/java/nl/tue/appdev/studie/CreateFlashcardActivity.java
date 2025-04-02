@@ -17,7 +17,7 @@ public class CreateFlashcardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_flashcard);
 
-        ImageButton backButton = findViewById(R.id.fc_create_back_button);
+        ImageButton backButton = findViewById(R.id.create_fc_back_button);
         backButton.setOnClickListener(v -> finish());
 
         Spinner spinnerSets = findViewById(R.id.spinner_sets);

@@ -77,10 +77,19 @@
             android:name=".CreateFlashcardActivity"
             android:exported="true" />
         <activity
+            android:name=".CreateFlashcardSetActivity"
+            android:exported="true" />
+        <activity
             android:name=".ManageGroupActivity"
             android:exported="true" />
         <activity
             android:name=".UploadNotesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ViewFlashcardActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ViewFlashcardSetActivity"
             android:exported="true" />
     </application>
 

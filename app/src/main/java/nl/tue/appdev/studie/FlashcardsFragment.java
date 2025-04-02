@@ -231,8 +231,11 @@ public class FlashcardsFragment extends Fragment {
 
             // Set OnClickListener for the FrameLayout
             customButton.setOnClickListener(v -> {
-                // TODO: add intent with extra information
-                Toast.makeText(getContext(), "Flashcard " + id + " clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), ViewFlashcardActivity.class);
+                intent.putExtra("flashcard_id", id);
+                intent.putExtra("group_id", groupId);
+                startActivity(intent);
+//                Toast.makeText(getContext(), "Flashcard " + id + " clicked", Toast.LENGTH_SHORT).show();
             });
         }
     }

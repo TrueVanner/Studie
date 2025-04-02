@@ -1,5 +1,6 @@
 package nl.tue.appdev.studie;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -232,8 +233,11 @@ public class SetsFragment extends Fragment {
 
             // Set OnClickListener for the FrameLayout
             customButton.setOnClickListener(v -> {
-                // TODO: add intent with extra information
-                Toast.makeText(getContext(), "Flashcardset " + id + " clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), ViewFlashcardSetActivity.class);
+                intent.putExtra("flashcardSetId", id);
+                intent.putExtra("group_id", groupId);
+                startActivity(intent);
+//                Toast.makeText(getContext(), "Flashcardset " + id + " clicked", Toast.LENGTH_SHORT).show();
             });
         }
     }
@@ -262,14 +266,10 @@ public class SetsFragment extends Fragment {
         retrieveFlashcardsets();
 
         Button createButton = view.findViewById(R.id.set_create);
-        //TODO: add intent to flashcardset create screen
-        /*
         createButton.setOnClickListener(v -> {
-            Intent toCreate = new Intent(getActivity(), CreateFlashcardActivity.class);
-            toCreate.putExtra("id", groupId);
+            Intent toCreate = new Intent(getActivity(), CreateFlashcardSetActivity.class);
+            toCreate.putExtra("group_id", groupId);
             startActivity(toCreate);
         });
-
-         */
     }
 }
