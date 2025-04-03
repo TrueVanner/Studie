@@ -1,5 +1,6 @@
 package nl.tue.appdev.studie;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,10 +20,12 @@ import java.util.List;
  */
 public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelectAdapter.ViewHolder> {
 
-    private final List<Flashcard> flashcardList;
-    private final List<String> selectedFlashcards;
+    private static final String TAG = "FlashcardSelecterAdapter";
 
-    public FlashcardSelectAdapter(List<Flashcard> flashcardList) {
+    private final ArrayList<Flashcard> flashcardList;
+    private final ArrayList<String> selectedFlashcards;
+
+    public FlashcardSelectAdapter(ArrayList<Flashcard> flashcardList) {
         this.flashcardList = flashcardList;
         this.selectedFlashcards = new ArrayList<>();
     }
@@ -43,9 +48,12 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 selectedFlashcards.add(flashcard.getId());
+                Log.d(TAG, "Added: " + flashcard.getId());
             } else {
                 selectedFlashcards.remove(flashcard.getId());
+                Log.d(TAG, "Removed: " + flashcard.getId());
             }
+            Log.d(TAG, "Selected flashcards: " + selectedFlashcards);
         });
     }
 
@@ -54,7 +62,7 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
         return flashcardList.size();
     }
 
-    public List<String> getSelectedFlashcards() {
+    public ArrayList<String> getSelectedFlashcards() {
         return selectedFlashcards;
     }
 
