@@ -26,6 +26,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GroupCreationActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
     private static final String TAG = "GroupCreationActivity";
@@ -41,7 +43,8 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     String userID = user.getUid();
     DocumentReference userRef = db.collection("users").document(userID);
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference();
-    String groupId=databaseReference.push().getKey();
+    CollectionReference groupRef=FirebaseFirestore.getInstance().collection("groups");
+    Map<String,Object> groupGet = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,9 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
             return insets;
         });
 
-
+        if(userID.isEmpty()){
+            userID="null_user";
+        }
         groupName=findViewById(R.id.group_name);
         groupCode =findViewById(R.id.group_course_code);
 
@@ -128,6 +133,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     }
 
     private void addDataToFirestore(String name, String code, boolean isPublic){
+        Intent toHome = new Intent(GroupCreationActivity.this, HomeActivity.class);
         Intent toGroup = new Intent(GroupCreationActivity.this, GroupActivity.class);
         CollectionReference dbGroups = db.collection("groups");
 
@@ -136,6 +142,15 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
         dbGroups.add(groups).addOnSuccessListener(documentReference -> {
                 Toast.makeText(GroupCreationActivity.this, "Group created successfully!",
                 Toast.LENGTH_SHORT).show();
+                groupGet.put("code", code);
+                groupGet.put("flashcards", flashcards);
+                groupGet.put("flashcardsets", flashcards);
+                groupGet.put("isPublic", isPublic);
+                groupGet.put("name", name);
+                groupGet.put("notes", flashcards);
+                DocumentReference groupDocRef = groupRef.document();
+                groupDocRef.set(groupGet);
+                String groupId=groupDocRef.getId();
                 userRef.update("groups." + groupId, name);
                 toGroup.putExtra("id", groupId);
                 startActivity(toGroup);
