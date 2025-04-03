@@ -3,6 +3,7 @@ package nl.tue.appdev.studie;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -20,6 +21,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
+
+import java.io.ByteArrayOutputStream;
 
 public class QRCodeActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -73,11 +76,13 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
                     runOnUiThread(() -> {
                         generateQRCode(qrCodeData);
                         groupNameTextView.setText(groupName);
+                        Log.e("QRCodeActivity", "Name: " + groupName + ", ID: " + groupId);
                     });
                 } else {
                     Log.e("QRCodeActivity", "Group Name is null");
                 }
             } else {
+                Log.e("QRCodeActivity", "ID:" + groupId);
                 Log.e("QRCodeActivity", "Document does not exist");
             }
             return null;
@@ -86,11 +91,26 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    private String bitmapToBase64(Bitmap bitmap, String qrCodeData) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        String base64Bitmap = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        return qrCodeData + ":" + base64Bitmap;
+    }
+
     private void generateQRCode(String text) {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         try {
             Bitmap bitmap = toBitmap(qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 200, 200));
             qrCodeImageView.setImageBitmap(bitmap);
+
+            // Convert bitmap to Base64 string
+            String qrCodeBase64 = bitmapToBase64(bitmap, text);
+
+            // Store the Base64 string in Firestore
+            storeQRCodeInFirestore(qrCodeBase64);
+
         } catch (WriterException e) {
             e.printStackTrace();
         }
@@ -106,5 +126,12 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
         return bitmap;
+    }
+
+    private void storeQRCodeInFirestore(String qrCodeBase64) {
+        DocumentReference docRef = db.collection("groups").document(groupId);
+        docRef.update("qrCode", qrCodeBase64)
+                .addOnSuccessListener(aVoid -> Log.d("QRCodeActivity", "QR Code stored successfully"))
+                .addOnFailureListener(e -> Log.e("QRCodeActivity", "Error storing QR Code", e));
     }
 }
