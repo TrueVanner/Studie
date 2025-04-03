@@ -1,6 +1,5 @@
 package nl.tue.appdev.studie;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,30 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.Group;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.Source;
+
+import java.util.HashMap;
 
 import nl.tue.appdev.studie.databinding.FragmentFirstBinding;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 public class MembersFragment extends Fragment {
 
@@ -88,24 +76,23 @@ public class MembersFragment extends Fragment {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        CollectionReference collectionRef = db.collection("users");
+        db.collection("users")
+            .get(Source.SERVER)
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, "Document ID: " + document.getId());
+                        String name = (String) document.getData().get("name");
+                        HashMap<String, String> groups = (HashMap<String, String>) document.getData().get("groups");
+                        Log.d(TAG, "Name: " + name + "; Groups: " + groups);
 
-        collectionRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d(TAG, "Document ID: " + document.getId());
-                    String name = (String) document.getData().get("name");
-                    HashMap<String, String> groups = (HashMap<String, String>) document.getData().get("groups");
-                    Log.d(TAG, "Name: " + name + "; Groups: " + groups);
-
-                    if (groups.containsKey(groupId)) {
-                        addMember(name);
+                        if (groups.containsKey(groupId)) {
+                            addMember(name);
+                        }
                     }
+                } else {
+                    Log.e(TAG, "Error getting documents", task.getException());
                 }
-
-            } else {
-                Log.e(TAG, "Error getting documents", task.getException());
-            }
         });
 
         /*

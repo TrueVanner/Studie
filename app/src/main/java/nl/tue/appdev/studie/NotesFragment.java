@@ -1,5 +1,8 @@
 package nl.tue.appdev.studie;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -15,19 +18,21 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,60 +48,65 @@ public class NotesFragment extends Fragment {
     private LinearLayout noteContainer;
 
     private FirebaseAuth mAuth;
-    private Map<String, Object> userDocument;
+    private FirebaseFirestore db;
+    private Map<String, Object> groupDocument;
     private String groupId;
-    private ArrayList<String> note_filenames = new ArrayList<>();
-    private ArrayList<Note> notes = new ArrayList<>();
+    private final ArrayList<Note> notes = new ArrayList<>();
 
-    public void retrieveNoteData() {
-        for (String filename : note_filenames) {
-            // TODO: process filenames properly
-            String noteId = "a";
-            String title = filename;
-            String author = "test_user";
-            String groupId = "groupUID1";
-            Note n = new Note(noteId, title, author, groupId);
-            notes.add(n);
+    public void retrieveNoteData(List<String> noteFilenames) {
+
+        for (String filename : noteFilenames) {
+            db.collection("notes")
+                    .document(filename)
+                    .get(Source.SERVER)
+                    .addOnCompleteListener(requireActivity(), task -> {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                Map<String, Object> noteDocument = document.getData();
+                                assert noteDocument != null;
+                                notes.add(new Note(filename, (String) noteDocument.get("title"), (String) noteDocument.get("author"), (String) noteDocument.get("groupID")));
+
+                                displayNotes();
+                            } else {
+                                Log.e(TAG, "No such document");
+                            }
+                        }
+                    });
         }
-
-        displayNotes();
     }
 
     public void retrieveNotes() {
         // Clear the list
-        notes = new ArrayList<>();
+        notes.clear();
 
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+        notes.add(new Note("4df4e207d6882956", "title", "author", "groupUID1"));
         // Get flashcards of the group
-        DocumentReference docRef = db.collection("groups").document(groupId);
-        docRef.get().addOnCompleteListener(requireActivity(), task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    userDocument = document.getData();
-                    assert userDocument != null;
-                    List<String> note_filenames_list = (List<String>) userDocument.get("notes");
-                    note_filenames = new ArrayList<>(note_filenames_list);
-                    Log.d(TAG, String.valueOf(note_filenames));
-
-                    retrieveNoteData();
-                } else {
-                    Log.d(TAG, "No such document");
-                }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
+        db.collection("groups")
+                .document(groupId)
+                .get(Source.SERVER)
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            groupDocument = document.getData();
+                            assert groupDocument != null;
+                            retrieveNoteData((List<String>) groupDocument.get("notes"));
+                        } else {
+                            Log.e(TAG, "No such document");
+                        }
+                    } else {
+                        Log.e(TAG, "get failed with ", task.getException());
+                    }
+                });
     }
 
     public void displayNotes() {
         noteContainer.removeAllViews();
 
         for (Note n : notes) {
-            String id = n.getFilename();
             String title = n.getTitle();
             String author = n.getAuthor();
 
@@ -211,20 +221,53 @@ public class NotesFragment extends Fragment {
 
             // Set OnClickListener for the FrameLayout
             customButton.setOnClickListener(v -> {
-                // TODO: implement note download functionality
-                Toast.makeText(getContext(), "Note " + id + " clicked", Toast.LENGTH_SHORT).show();
+                String filename = n.getFilename();
+                selectDirectoryLauncher.launch(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE));
             });
         }
+    }
+
+    private ActivityResultLauncher<Intent> selectDirectoryLauncher;
+
+    private void registerDirectoryLaucher() {
+        assert getActivity() != null;
+        selectDirectoryLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent data = result.getData();
+                        if(data == null || data.getData() == null) {
+                            Log.e(TAG, "data is null");
+                            return;
+                        }
+
+                        DocumentFile selectedDirectory = DocumentFile.fromTreeUri(getActivity(), data.getData());
+
+                        if(selectedDirectory == null) {
+                            Log.e(TAG, "Selected directory is null");
+                            return;
+                        }
+
+                        // Create a new directory within the selected directory
+                        DocumentFile newDirectory = selectedDirectory.createDirectory(groupId);
+                    }
+                }
+        );
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
         if (getArguments() != null) {
             groupId = getArguments().getString("id");
             Log.d(TAG, "Received Data: " + groupId);
         }
+
+        registerDirectoryLaucher();
     }
 
     @Override
@@ -242,10 +285,9 @@ public class NotesFragment extends Fragment {
 
         Button createButton = view.findViewById(R.id.note_upload);
         createButton.setOnClickListener(v -> {
-            // TODO: add intent to note upload screen
-            //Intent toUpload = new Intent(getActivity(), ...);
-            //toCreate.putExtra("id", groupId);
-            //startActivity(toUpload);
+            Intent toUploadNotes = new Intent(getActivity(), UploadNotesActivity.class);
+            toUploadNotes.putExtra("groupId", groupId);
+            startActivity(toUploadNotes);
         });
     }
 }

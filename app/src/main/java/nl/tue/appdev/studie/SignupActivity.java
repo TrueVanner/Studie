@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -119,25 +120,26 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").whereEqualTo("name", name).get()
-                .addOnCompleteListener(this, task -> {
-                    Log.d(TAG, "task succesful");
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
-                            usernameAvailable = false;
-                        }
-
-                        if (usernameAvailable) {
-                            createUser(email, password);
-                        } else {
-                            updateUI(UpdateType.USERNAME_TAKEN);
-                            usernameAvailable = true;
-                        }
-                    } else {
-                        Log.d(TAG, "Query failed");
+        db.collection("users")
+            .whereEqualTo("name", name)
+            .get(Source.SERVER)
+            .addOnCompleteListener(this, task -> {
+                Log.d(TAG, "task succesful");
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        usernameAvailable = false;
                     }
-                });
+                    if (usernameAvailable) {
+                        createUser(email, password);
+                    } else {
+                        updateUI(UpdateType.USERNAME_TAKEN);
+                        usernameAvailable = true;
+                    }
+                } else {
+                    Log.e(TAG, "Query failed");
+                }
+            });
     }
 
     @Override

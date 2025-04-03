@@ -68,10 +68,7 @@ public class UploadNotesActivity extends AppCompatActivity implements View.OnCli
             return insets;
         });
 
-//        Intent intent = getIntent();
-//        groupId = intent.getStringExtra("id");
-        groupId = "groupUID1";
-
+        groupId = getIntent().getStringExtra("groupId");
 
         backButton = findViewById(R.id.upload_notes_back_button);
         noteTitle = findViewById(R.id.upload_notes_note_title);

@@ -7,7 +7,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,17 +14,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 //import java.util.logging.Logger;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
@@ -90,37 +87,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         FirebaseUser user = mAuth.getCurrentUser();
         assert user != null;
         String userID = user.getUid();
-        DocumentReference docRef = db.collection("users").document(userID);
-        docRef.get().addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    userDocument = document.getData();
-                    assert userDocument != null;
-                    groups = (HashMap<String, String>) userDocument.get("groups");
-                    Log.d(TAG, String.valueOf(groups));
+        db.collection("users")
+            .document(userID)
+            .get(Source.SERVER).addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        userDocument = document.getData();
+                        assert userDocument != null;
+                        groups = (HashMap<String, String>) userDocument.get("groups");
+                        Log.d(TAG, String.valueOf(groups));
 
-                    // Pass the hashmap of groups to the fragment
-                    if (groupview != null) {
+                        // Pass the hashmap of groups to the fragment
                         groupview.updateGroups(groups);
 
                         fragmentManager.beginTransaction()
                                 .replace(R.id.fragment_group_view, groupview)
                                 .commit();
                     } else {
-                        Log.d(TAG, "fragment is null");
+                        Log.d(TAG, "No such document");
                     }
                 } else {
-                    Log.d(TAG, "No such document");
+                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
         });
-
-
-
     }
 
     @Override

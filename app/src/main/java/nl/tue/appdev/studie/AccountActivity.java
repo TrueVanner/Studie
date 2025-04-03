@@ -17,16 +17,15 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class AccountActivity extends AppCompatActivity implements View.OnClickListener {
     //SonarQube is crying over the TAG declaration, but I think this looks better
-    private String TAG = "AccountActivity";
+    private final String TAG = "AccountActivity";
 
     private FirebaseAuth mAuth;
 
@@ -61,24 +60,26 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         user = mAuth.getCurrentUser();
         assert user != null;
         String userID = user.getUid();
-        DocumentReference docRef = db.collection("users").document(userID);
-        docRef.get().addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    Map<String, Object> userDocument = document.getData();
-                    assert userDocument != null;
-                    name = (String) userDocument.get("name");
-                    assert name != null;
-                    nameView.setText(name);
-                    Log.d(TAG, name);
+        db.collection("users")
+            .document(userID)
+            .get(Source.SERVER)
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        Map<String, Object> userDocument = document.getData();
+                        assert userDocument != null;
+                        name = (String) userDocument.get("name");
+                        assert name != null;
+                        nameView.setText(name);
+                        Log.d(TAG, name);
+                    } else {
+                        Log.e(TAG, "No such document");
+                    }
                 } else {
-                    Log.d(TAG, "No such document");
+                    Log.e(TAG, "get failed with ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
         });
         // Update email view
         String email;

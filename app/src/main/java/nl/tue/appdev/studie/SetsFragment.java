@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -56,30 +55,32 @@ public class SetsFragment extends Fragment {
 
         for (String flashcardset_id : flashcardset_ids) {
             // Get flashcardset data using the flashcardset ID
-            DocumentReference docRef = db.collection("flashcardsets").document(flashcardset_id);
-            docRef.get().addOnCompleteListener(requireActivity(), task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        userDocument = document.getData();
-                        assert userDocument != null;
-                        String title = (String) userDocument.get("title");
-                        List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
-                        flashcard_ids = new ArrayList<>(flashcard_ids_list);
-                        String author = (String) userDocument.get("author");
-                        Log.d(TAG,  title + " " + flashcard_ids + " " + author);
+            db.collection("flashcardsets")
+                .document(flashcardset_id)
+                .get(Source.SERVER)
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            userDocument = document.getData();
+                            assert userDocument != null;
+                            String title = (String) userDocument.get("title");
+                            List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
+                            flashcard_ids = new ArrayList<>(flashcard_ids_list);
+                            String author = (String) userDocument.get("author");
+                            Log.d(TAG,  title + " " + flashcard_ids + " " + author);
 
-                        Flashcardset s = new Flashcardset(flashcardset_id, title, flashcard_ids, author);
-                        flashcardsets.add(s);
+                            Flashcardset s = new Flashcardset(flashcardset_id, title, flashcard_ids, author);
+                            flashcardsets.add(s);
 
-                        displayFlashcardsets();
+                            displayFlashcardsets();
+                        } else {
+                            Log.e(TAG, "No such document");
+                        }
                     } else {
-                        Log.d(TAG, "No such document");
+                        Log.e(TAG, "get failed with ", task.getException());
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
             });
         }
     }

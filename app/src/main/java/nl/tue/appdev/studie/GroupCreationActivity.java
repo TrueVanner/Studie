@@ -24,6 +24,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 
@@ -33,8 +34,8 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     private ToggleButton togglePublic;
     private EditText groupName;
     private EditText groupCode;
-    private ArrayList<Flashcard> flashcards = new ArrayList<>();
-    private FirebaseFirestore db=FirebaseFirestore.getInstance();
+    private final ArrayList<Flashcard> flashcards = new ArrayList<>();
+    private final FirebaseFirestore db=FirebaseFirestore.getInstance();
     private boolean groupnameAvailable = true;
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     FirebaseUser user = mAuth.getCurrentUser();
@@ -159,7 +160,9 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     }
 
     private void tryCreateGroup(String name, String code, boolean isPublic) {
-        db.collection("groups").whereEqualTo("name", name).get()
+        db.collection("groups")
+                .whereEqualTo("name", name)
+                .get(Source.SERVER)
                 .addOnCompleteListener(this, task -> {
                     Log.d(TAG, "task succesful");
                     if (task.isSuccessful()) {
@@ -167,7 +170,6 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
                             Log.d(TAG, document.getId() + " => " + document.getData());
                             groupnameAvailable = false;
                         }
-
                         if (groupnameAvailable) {
                             addDataToFirestore(name, code, isPublic);
                         } else {
@@ -175,7 +177,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
                             groupnameAvailable = true;
                         }
                     } else {
-                        Log.d(TAG, "Query failed");
+                        Log.e(TAG, "Query failed");
                     }
                 });
     }

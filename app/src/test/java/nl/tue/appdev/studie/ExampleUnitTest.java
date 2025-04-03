@@ -1,8 +1,8 @@
 package nl.tue.appdev.studie;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -14,4 +14,14 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
+
+    @Test
+    public void test_note_constructor() {
+        Note note = new Note("a", "b","c","d");
+        assertEquals("b", note.getTitle());
+        assertEquals("c", note.getAuthor());
+        assertEquals("d", note.getGroupID());
+        assertEquals("a", note.getFilename());
+    }
+
 }

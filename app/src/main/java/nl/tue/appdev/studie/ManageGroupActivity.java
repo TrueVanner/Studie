@@ -3,10 +3,8 @@ package nl.tue.appdev.studie;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -18,15 +16,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.zxing.qrcode.encoder.QRCode;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.firebase.firestore.Source;
 
 public class ManageGroupActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -66,20 +58,22 @@ public class ManageGroupActivity extends AppCompatActivity implements View.OnCli
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        DocumentReference userRef = db.collection("groups").document(groupId);
-        userRef.get().addOnCompleteListener(this,task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    String groupName = (String) document.getData().get("name");
-                    groupNameText.setText(groupName);
+        db.collection("groups")
+            .document(groupId)
+            .get(Source.SERVER)
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        String groupName = (String) document.getData().get("name");
+                        groupNameText.setText(groupName);
+                    } else {
+                        Log.e(TAG, "No such document");
+                    }
                 } else {
-                    Log.d(TAG, "No such document");
+                    Log.e(TAG, "get failed with ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
         });
 
         FragmentManager fragmentManager = getSupportFragmentManager();

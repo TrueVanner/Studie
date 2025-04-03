@@ -18,9 +18,9 @@ import androidx.fragment.app.FragmentManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    private HashMap<String, String> groups = new HashMap<>(); // ID, name
+    private final HashMap<String, String> groups = new HashMap<>(); // ID, name
     private HashMap<String, String> currGroups = new HashMap<>(); // ID, name
     private String query;
 
@@ -80,27 +80,26 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
         assert user != null;
         String userID = user.getUid();
 
-        DocumentReference userRef = db.collection("users").document(userID);
-        userRef.get().addOnCompleteListener(this,task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    Map<String, Object> userDocument = document.getData();
-                    assert userDocument != null;
-                    currGroups = (HashMap<String, String>) userDocument.get("groups");
-                    Log.d(TAG, String.valueOf(currGroups));
-                    createFragment(groupview);
+        db.collection("users")
+            .document(userID)
+            .get(Source.SERVER)
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        Map<String, Object> userDocument = document.getData();
+                        assert userDocument != null;
+                        currGroups = (HashMap<String, String>) userDocument.get("groups");
+                        Log.d(TAG, String.valueOf(currGroups));
+                        createFragment(groupview);
+                    } else {
+                        Log.e(TAG, "No such document");
+                    }
                 } else {
-                    Log.d(TAG, "No such document");
+                    Log.e(TAG, "get failed with ", task.getException());
                 }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
-
-
-
+            });
     }
 
     @Override
@@ -119,7 +118,7 @@ public class JoinActivity extends AppCompatActivity implements View.OnClickListe
         FragmentManager fragmentManager = getSupportFragmentManager();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference collectionRef = db.collection("groups");
-        collectionRef.get().addOnCompleteListener(this, task -> {
+        collectionRef.get(Source.SERVER).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
                 // Loop through all groups and add the public ones to a hashmap
                 for (DocumentSnapshot document : task.getResult()) {

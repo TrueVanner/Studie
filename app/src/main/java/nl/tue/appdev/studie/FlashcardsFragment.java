@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -29,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,29 +55,31 @@ public class FlashcardsFragment extends Fragment {
 
         for (String flashcard_id : flashcard_ids) {
             // Get flashcard data using the flashcard ID
-            DocumentReference docRef = db.collection("flashcards").document(flashcard_id);
-            docRef.get().addOnCompleteListener(requireActivity(), task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        userDocument = document.getData();
-                        assert userDocument != null;
-                        String question = (String) userDocument.get("question");
-                        String answer = (String) userDocument.get("answer");
-                        String author = (String) userDocument.get("author");
-                        Log.d(TAG,  question + " " + answer + " " + author);
+            db.collection("flashcards")
+                .document(flashcard_id)
+                .get(Source.SERVER)
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            userDocument = document.getData();
+                            assert userDocument != null;
+                            String question = (String) userDocument.get("question");
+                            String answer = (String) userDocument.get("answer");
+                            String author = (String) userDocument.get("author");
+                            Log.d(TAG,  question + " " + answer + " " + author);
 
-                        Flashcard f = new Flashcard(flashcard_id, question, answer, author);
-                        flashcards.add(f);
+                            Flashcard f = new Flashcard(flashcard_id, question, answer, author);
+                            flashcards.add(f);
 
-                        displayFlashcards();
+                            displayFlashcards();
+                        } else {
+                            Log.e(TAG, "No such document");
+                        }
                     } else {
-                        Log.d(TAG, "No such document");
+                        Log.e(TAG, "get failed with ", task.getException());
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
             });
         }
     }
@@ -91,7 +93,7 @@ public class FlashcardsFragment extends Fragment {
 
         // Get flashcards of the group
         DocumentReference docRef = db.collection("groups").document(groupId);
-        docRef.get().addOnCompleteListener(requireActivity(), task -> {
+        docRef.get(Source.SERVER).addOnCompleteListener(requireActivity(), task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
