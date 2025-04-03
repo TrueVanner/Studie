@@ -49,6 +49,8 @@ public class FlashcardsFragment extends Fragment {
     private ArrayList<String> flashcard_ids = new ArrayList<>();
     private ArrayList<Flashcard> flashcards = new ArrayList<>();
 
+    private boolean refresh = true;
+
     public void retrieveFlashcardData() {
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -255,6 +257,8 @@ public class FlashcardsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        refresh = false;
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_flashcards, container, false);
     }
@@ -271,5 +275,16 @@ public class FlashcardsFragment extends Fragment {
             toCreate.putExtra("id", groupId);
             startActivity(toCreate);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (refresh) {
+            retrieveFlashcards();
+        } else {
+            refresh = true;
+        }
     }
 }
