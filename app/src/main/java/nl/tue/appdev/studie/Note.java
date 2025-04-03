@@ -4,13 +4,13 @@ public class Note {
 
     private final String filename; // serves as ID
     private final String title;
-    private final String author;
+    private final String authorId;
     private final String groupID;
 
-    public Note(String filename, String title, String author, String groupID) {
+    public Note(String filename, String title, String authorId, String groupID) {
         this.filename = filename;
         this.title = title;
-        this.author = author;
+        this.authorId = authorId;
         this.groupID = groupID;
     }
 
@@ -22,8 +22,8 @@ public class Note {
         return title;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getAuthorId() {
+        return authorId;
     }
 
     public String getGroupID() {

@@ -53,7 +53,9 @@ android {
 dependencies {
     // connection with file server
     implementation(libs.commons.net)
-//    implementation(libs.android.pdf.viewer)
+
+    // pdf viewer
+    implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.1")
 
     // auth
     implementation(platform(libs.firebase.bom))
@@ -109,8 +111,10 @@ sonar {
 val ignoredByJacoco = mutableListOf<String>()
 val fileFilter = mutableListOf<String>()
 val buildKotlinClasses = "/tmp/kotlin-classes/debug"
-val buildJavaClasses = "/intermediates/javac/debug/classes"
-val testExecutionFile = "/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+val buildJavaClasses = "/intermediates/javac/debug/compileDebugJavaWithJavac/classes"
+//val buildJavaClasses = "/intermediates/javac/debug/classes"
+val testExecutionFile = "/outputs/code_coverage/debugUnitTest/testDebugUnitTest.exec"
+//val testExecutionFile = "/jacoco/testDebugUnitTest.exec"
 
 // List of files that can be ignored for test coverage
 val coverageExclusions = listOf(
@@ -156,6 +160,8 @@ subprojects.forEach { project ->
 
 // Root task that generates an aggregated Jacoco test coverage report for all sub-projects
 tasks.register("jacocoFullReport", JacocoReport::class.java) {
+//    dependsOn(includedProjects.map { "${it.name}:jacocoReport" })
+
     group = "Reporting"
     description = "Generates an aggregate report from all subprojects"
 

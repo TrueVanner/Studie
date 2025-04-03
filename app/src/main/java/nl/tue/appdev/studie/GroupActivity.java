@@ -2,33 +2,23 @@ package nl.tue.appdev.studie;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import androidx.fragment.app.FragmentManager;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.util.Log;
-import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import nl.tue.appdev.studie.databinding.ActivityGroupBinding;
 
 public class GroupActivity extends AppCompatActivity {
 
-    private String TAG = "GroupActivity";
+    private final String TAG = "GroupActivity";
 
     private ActivityGroupBinding binding;
     TabLayout tabLayout;
@@ -40,7 +30,7 @@ public class GroupActivity extends AppCompatActivity {
 
     private Map<String, Object> userDocument;
 
-    private ArrayList<Flashcard> flashcards = new ArrayList<>();
+    private final ArrayList<Flashcard> flashcards = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,20 +87,14 @@ public class GroupActivity extends AppCompatActivity {
             }
         });
 
-        manage_fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent toManage = new Intent(GroupActivity.this, ManageGroupActivity.class);
-                toManage.putExtra("id", groupId);
-                startActivity(toManage);
-            }
+        manage_fab.setOnClickListener(view -> {
+            Intent toManage = new Intent(GroupActivity.this, ManageGroupActivity.class);
+            toManage.putExtra("id", groupId);
+            startActivity(toManage);
         });
-        back_fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent toHome = new Intent(GroupActivity.this, HomeActivity.class);
-                startActivity(toHome);
-            }
+        back_fab.setOnClickListener(view -> {
+            Intent toHome = new Intent(GroupActivity.this, HomeActivity.class);
+            startActivity(toHome);
         });
 
     }

@@ -10,9 +10,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
 
     private String groupId;
     private String flashcardSetId;
-    private List<Flashcard> flashcards = new ArrayList<>();
+    private final List<Flashcard> flashcards = new ArrayList<>();
     private boolean isShowingQuestion = true;
     private int currentFlashcardIndex = 0;
     private int loadedFlashcardCount = 0;
@@ -38,12 +37,15 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
     private ImageButton prevButton;
     private ImageButton nextButton;
 
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_set_view);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         if (mAuth.getCurrentUser() == null) { // redirect to login screen if user is not logged in
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
@@ -79,54 +81,57 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      * @param flashcardSetId passed down flashcard set id with the intent, to fetch from the database
      */
     private void loadFlashcardSet(String flashcardSetId) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference flashcardSetRef = db.collection("flashcardsets").document(flashcardSetId);
+        db.collection("flashcardsets").document(flashcardSetId)
+                .get(Source.SERVER)
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Log.e(TAG, "DocumentSnapshot Data: " + documentSnapshot.getData());
 
-        flashcardSetRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                Log.e(TAG, "DocumentSnapshot Data: " + documentSnapshot.getData());
+                        List<String> flashcardIds = (List<String>) documentSnapshot.get("flashcards");
 
-                List<String> flashcardIds = (List<String>) documentSnapshot.get("flashcards");
-
-                if (flashcardIds != null) {
-                    flashcards.clear();
-                    expectedFlashcardCount = flashcardIds.size();
-
-                    for (int i = 0; i < flashcardIds.size(); i++) {
-                        String flashcardId = flashcardIds.get(i);
-                        int flashcardIndex = i;
-
-                        FirebaseFirestore db2 = FirebaseFirestore.getInstance();
-                        DocumentReference flashcardRef = db2.collection("flashcards").document(flashcardId);
-
-                        flashcardRef.get().addOnSuccessListener(documentSnapshot2 -> {
-                            if (documentSnapshot2.exists()) {
-                                String question = documentSnapshot2.getString("question");
-                                String answer = documentSnapshot2.getString("answer");
-                                String author = documentSnapshot2.getString("author");
-
-                                Flashcard flashcard = new Flashcard(flashcardId, question, answer, author);
-                                flashcards.add(flashcardIndex, flashcard);
-
-                                // Update counter
-                                loadedFlashcardCount++;
-
-                                // Check if all flashcards have been loaded
-                                if (loadedFlashcardCount == expectedFlashcardCount) {
-                                    loadFlashcard(0); // Load the first flashcard
-                                }
-                            } else {
-                                Log.e(TAG, "Flashcard with ID <" + flashcardId + "> not found in the database");
-                            }
-                        }).addOnFailureListener(e -> Log.e(TAG, "Error fetching flashcard: " + flashcardId, e));
+                        if (flashcardIds != null) {
+                            expectedFlashcardCount = flashcardIds.size();
+                            retrieveFlashcardSetData(flashcardIds);
+                        } else {
+                            Log.e(TAG, "Flashcards field is null or missing");
+                        }
+                    } else {
+                        Log.e(TAG, "Flashcard set not found in the database");
                     }
-                } else {
-                    Log.e(TAG, "Flashcards field is null or missing");
-                }
-            } else {
-                Log.e(TAG, "Flashcard set not found in the database");
-            }
         }).addOnFailureListener(e -> Log.e(TAG, "Error fetching flashcard set", e));
+    }
+
+    private void retrieveFlashcardSetData(List<String> flashcardIds) {
+        flashcards.clear();
+        for(int i = 0; i < expectedFlashcardCount; i++) { flashcards.add(null); }
+
+        for (int i = 0; i < flashcardIds.size(); i++) {
+            String flashcardId = flashcardIds.get(i);
+            int flashcardIndex = i;
+            db.collection("flashcards")
+                    .document(flashcardId)
+                    .get(Source.SERVER)
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String question = documentSnapshot.getString("question");
+                            String answer = documentSnapshot.getString("answer");
+                            String author = documentSnapshot.getString("author");
+
+                            Flashcard flashcard = new Flashcard(flashcardId, question, answer, author);
+                            flashcards.set(flashcardIndex, flashcard);
+
+                            // Update counter
+                            loadedFlashcardCount++;
+
+                            // Check if all flashcards have been loaded
+                            if (loadedFlashcardCount == expectedFlashcardCount) {
+                                loadFlashcard(0); // Load the first flashcard
+                            }
+                        } else {
+                            Log.e(TAG, "Flashcard with ID <" + flashcardId + "> not found in the database");
+                        }
+                    }).addOnFailureListener(e -> Log.e(TAG, "Error fetching flashcard: " + flashcardId, e));
+        }
     }
 
 

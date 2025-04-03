@@ -128,8 +128,8 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
         else if(id==R.id.create_group_back_button){
             startActivity(toHome);
         } else {
-            String toastText = "milbei";
-            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
+//            String toastText = "milbei";
+//            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -141,8 +141,8 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
         Groups groups = new Groups(name, code, isPublic);
 
         dbGroups.add(groups).addOnSuccessListener(documentReference -> {
-                Toast.makeText(GroupCreationActivity.this, "Group created successfully!",
-                Toast.LENGTH_SHORT).show();
+//                Toast.makeText(GroupCreationActivity.this, "Group created successfully!",
+//                Toast.LENGTH_SHORT).show();
                 groupGet.put("code", code);
                 groupGet.put("flashcards", flashcards);
                 groupGet.put("flashcardsets", flashcards);

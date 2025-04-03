@@ -47,8 +47,39 @@ public class SetsFragment extends Fragment {
     private String groupId;
     private ArrayList<String> flashcardset_ids = new ArrayList<>();
     private ArrayList<String> flashcard_ids = new ArrayList<>();
-    private ArrayList<Flashcardset> flashcardsets = new ArrayList<>();
+    private final ArrayList<Flashcardset> flashcardsets = new ArrayList<>();
 
+    private boolean startedLoading = false;
+    public void retrieveFlashcardsets() {
+        startedLoading = true;
+        // Clear the list
+        flashcardsets.clear();
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get flashcards of the group
+        DocumentReference docRef = db.collection("groups").document(groupId);
+        docRef.get(Source.SERVER).addOnCompleteListener(requireActivity(), task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    userDocument = document.getData();
+                    assert userDocument != null;
+                    List<String> flashcardset_ids_list = (List<String>) userDocument.get("flashcardsets");
+                    flashcardset_ids = new ArrayList<>(flashcardset_ids_list);
+                    Log.d(TAG, String.valueOf(flashcardset_ids));
+
+                    retrieveFlashcardsetData();
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+    }
     public void retrieveFlashcardsetData() {
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -83,36 +114,8 @@ public class SetsFragment extends Fragment {
                     }
             });
         }
-    }
-
-    public void retrieveFlashcardsets() {
-        // Clear the list
-        flashcardsets = new ArrayList<>();
-
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Get flashcards of the group
-        DocumentReference docRef = db.collection("groups").document(groupId);
-        docRef.get(Source.SERVER).addOnCompleteListener(requireActivity(), task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                    userDocument = document.getData();
-                    assert userDocument != null;
-                    List<String> flashcardset_ids_list = (List<String>) userDocument.get("flashcardsets");
-                    flashcardset_ids = new ArrayList<>(flashcardset_ids_list);
-                    Log.d(TAG, String.valueOf(flashcardset_ids));
-
-                    retrieveFlashcardsetData();
-                } else {
-                    Log.d(TAG, "No such document");
-                }
-            } else {
-                Log.d(TAG, "get failed with ", task.getException());
-            }
-        });
+        // i know this isn't async but should be good enough
+        startedLoading = false;
     }
 
     public void displayFlashcardsets() {
@@ -272,5 +275,11 @@ public class SetsFragment extends Fragment {
             toCreate.putExtra("group_id", groupId);
             startActivity(toCreate);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(!startedLoading) { retrieveFlashcardsets(); }
     }
 }

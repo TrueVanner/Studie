@@ -29,12 +29,15 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -257,9 +260,29 @@ public class UploadNotesActivity extends AppCompatActivity implements View.OnCli
             db.collection("notes")
                     .document(note.getFilename())
                     .set(note)
-                    .addOnSuccessListener(documentReference -> mainHandler.post(this::handleUploadSuccess))
-                    .addOnFailureListener(e -> mainHandler.post((() -> handleUploadFailure(e))));
+                    .addOnSuccessListener(aVoid -> {
+                        db.collection("groups").document(groupId)
+                                .get(Source.SERVER)
+                                .addOnSuccessListener(groupDoc -> {
+                                    if (groupDoc.exists()) {
+                                        List<String> notes = (List<String>) groupDoc.get("notes");
+                                        if (notes == null) {
+                                            notes = new ArrayList<>(); // error prevention
+                                        }
+                                        // add the new flashcard set ID to the flashcardsets array in the group
+                                        notes.add(note.getFilename());
+
+                                        db.collection("groups").document(groupId)
+                                                .update("notes", notes)
+                                                .addOnSuccessListener(documentReference -> mainHandler.post(this::handleUploadSuccess))
+                                                .addOnFailureListener(e -> mainHandler.post(() -> handleUploadFailure(e)));
+                                    }
+                                })
+                                .addOnFailureListener(e -> mainHandler.post(() -> handleUploadFailure(e)));
+                    })
+                    .addOnFailureListener(e -> mainHandler.post(() -> handleUploadFailure(e)));
         });
+//                    .addOnFailureListener(e -> mainHandler.post((() -> handleUploadFailure(e))));
     }
 
     /**

@@ -1,12 +1,13 @@
 package nl.tue.appdev.studie;
 
-import static android.app.Activity.RESULT_OK;
-
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,14 +19,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
@@ -34,16 +33,18 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class NotesFragment extends Fragment {
 
     private static final String TAG = "NotesFragment";
-
-    private View view;
 
     private LinearLayout noteContainer;
 
@@ -53,8 +54,35 @@ public class NotesFragment extends Fragment {
     private String groupId;
     private final ArrayList<Note> notes = new ArrayList<>();
 
-    public void retrieveNoteData(List<String> noteFilenames) {
+    private boolean startedLoading = false;
+    public void retrieveNotes() {
+        startedLoading = true;
+        // Clear the list
+        notes.clear();
 
+        // Get flashcards of the group
+        db.collection("groups")
+                .document(groupId)
+                .get(Source.SERVER)
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            groupDocument = document.getData();
+                            assert groupDocument != null;
+                            List<String> noteFilenames = (List<String>) groupDocument.get("notes");
+                            assert noteFilenames != null;
+                            retrieveNoteData(noteFilenames);
+                        } else {
+                            Log.e(TAG, "No such document");
+                        }
+                    } else {
+                        Log.e(TAG, "get failed with ", task.getException());
+                    }
+                });
+    }
+    public void retrieveNoteData(List<String> noteFilenames) {
         for (String filename : noteFilenames) {
             db.collection("notes")
                     .document(filename)
@@ -67,7 +95,6 @@ public class NotesFragment extends Fragment {
                                 Map<String, Object> noteDocument = document.getData();
                                 assert noteDocument != null;
                                 notes.add(new Note(filename, (String) noteDocument.get("title"), (String) noteDocument.get("author"), (String) noteDocument.get("groupID")));
-
                                 displayNotes();
                             } else {
                                 Log.e(TAG, "No such document");
@@ -75,40 +102,21 @@ public class NotesFragment extends Fragment {
                         }
                     });
         }
+        // i know this isn't async but should be good enough
+        startedLoading = false;
     }
 
-    public void retrieveNotes() {
-        // Clear the list
-        notes.clear();
 
-        notes.add(new Note("4df4e207d6882956", "title", "author", "groupUID1"));
-        // Get flashcards of the group
-        db.collection("groups")
-                .document(groupId)
-                .get(Source.SERVER)
-                .addOnCompleteListener(requireActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            groupDocument = document.getData();
-                            assert groupDocument != null;
-                            retrieveNoteData((List<String>) groupDocument.get("notes"));
-                        } else {
-                            Log.e(TAG, "No such document");
-                        }
-                    } else {
-                        Log.e(TAG, "get failed with ", task.getException());
-                    }
-                });
-    }
 
     public void displayNotes() {
         noteContainer.removeAllViews();
 
+//        notes.add(new Note("4df4e207d6882956", "title", "author", "groupUID1"));
         for (Note n : notes) {
+//            Log.d(TAG, "got here");
             String title = n.getTitle();
-            String author = n.getAuthor();
+            String authorId = n.getAuthorId();
+
 
             // Create a FrameLayout to act as a button container
             FrameLayout buttonContainer = new FrameLayout(getContext());
@@ -162,7 +170,7 @@ public class NotesFragment extends Fragment {
             // Author text (20% width)
             TextView authorText = new TextView(getContext());
             authorText.setId(View.generateViewId());
-            authorText.setText(author);
+            authorText.setText(authorId);
             authorText.setMaxLines(1);
             authorText.setTextColor(Color.WHITE);
             authorText.setTextSize(16);
@@ -220,40 +228,74 @@ public class NotesFragment extends Fragment {
             set.applyTo(buttonLayout);
 
             // Set OnClickListener for the FrameLayout
-            customButton.setOnClickListener(v -> {
-                String filename = n.getFilename();
-                selectDirectoryLauncher.launch(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE));
-            });
+            customButton.setOnClickListener(view -> loadPDF(n.getFilename()));
         }
     }
 
-    private ActivityResultLauncher<Intent> selectDirectoryLauncher;
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private void loadPDF(String filename) {
+        Context context = getContext();
+        if (context == null) {
+            Log.e(TAG, "Context was null, somehow");
+            return;
+        }
 
-    private void registerDirectoryLaucher() {
-        assert getActivity() != null;
-        selectDirectoryLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        if(data == null || data.getData() == null) {
-                            Log.e(TAG, "data is null");
-                            return;
-                        }
+        File fileToWrite = new File(context.getCacheDir(), filename);
+        if (!fileToWrite.exists()) {
+            try {
+                Toast.makeText(getContext(), "Downloading note!", Toast.LENGTH_SHORT).show();
+                boolean success = fileToWrite.createNewFile();
 
-                        DocumentFile selectedDirectory = DocumentFile.fromTreeUri(getActivity(), data.getData());
-
-                        if(selectedDirectory == null) {
-                            Log.e(TAG, "Selected directory is null");
-                            return;
-                        }
-
-                        // Create a new directory within the selected directory
-                        DocumentFile newDirectory = selectedDirectory.createDirectory(groupId);
-                    }
+                executor.execute(() -> {
+                    FileServer.download(filename, fileToWrite);
+                    Log.d(TAG, String.valueOf(fileToWrite.length()));
+                    mainHandler.post(() -> viewPDF(filename));
+                });
+                if (!success) {
+                    Log.e(TAG, "Failed to create new file");
                 }
-        );
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to create new file", e);
+            }
+        } else {
+            viewPDF(filename);
+        }
     }
+
+    private void viewPDF(String filename) {
+        Intent toPDFView = new Intent(getActivity(), PDFViewerActivity.class);
+        toPDFView.putExtra("filename", filename);
+        startActivity(toPDFView);
+    }
+
+//    private ActivityResultLauncher<Intent> selectDirectoryLauncher;
+//
+//    private void registerDirectoryLaucher() {
+//        assert getActivity() != null;
+//        selectDirectoryLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                result -> {
+//                    if (result.getResultCode() == RESULT_OK) {
+//                        Intent data = result.getData();
+//                        if(data == null || data.getData() == null) {
+//                            Log.e(TAG, "data is null");
+//                            return;
+//                        }
+//
+//                        DocumentFile selectedDirectory = DocumentFile.fromTreeUri(getActivity(), data.getData());
+//
+//                        if(selectedDirectory == null) {
+//                            Log.e(TAG, "Selected directory is null");
+//                            return;
+//                        }
+//
+//                        // Create a new directory within the selected directory
+//                        DocumentFile newDirectory = selectedDirectory.createDirectory(groupId);
+//                    }
+//                }
+//        );
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -266,8 +308,6 @@ public class NotesFragment extends Fragment {
             groupId = getArguments().getString("id");
             Log.d(TAG, "Received Data: " + groupId);
         }
-
-        registerDirectoryLaucher();
     }
 
     @Override
@@ -289,5 +329,11 @@ public class NotesFragment extends Fragment {
             toUploadNotes.putExtra("groupId", groupId);
             startActivity(toUploadNotes);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(!startedLoading) { retrieveNotes(); }
     }
 }
