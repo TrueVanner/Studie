@@ -15,6 +15,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * Activity to view and interact with a flashcard.
@@ -59,12 +61,12 @@ public class ViewFlashcardActivity extends AppCompatActivity implements View.OnC
         flashcardId = intent.getStringExtra("flashcard_id");
 
         if (flashcardId != null) {
-//            loadFlashcardData(flashcardId);
+            loadFlashcardData(flashcardId);
         } else {
             Log.e(TAG, "No flashcard ID");
         }
 
-        createTestFlashcard();
+//        createTestFlashcard();
 
     }
 
@@ -74,29 +76,21 @@ public class ViewFlashcardActivity extends AppCompatActivity implements View.OnC
      * @param flashcardId The ID of the flashcard to be loaded.
      */
     private void loadFlashcardData(String flashcardId) {
-        DatabaseReference flashcardRef = FirebaseDatabase.getInstance().getReference("flashcards").child(flashcardId);
-        Log.e(TAG, "datadatadatadatadatadatadatadatadatadatadatadatadatadatadata");
-        flashcardRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    questionText = snapshot.child("question").getValue(String.class);
-                    answerText = snapshot.child("answer").getValue(String.class);
-
-                    FlashcardFragment flashcardFragment = FlashcardFragment.newInstance(questionText, answerText);
-
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_flashcard, flashcardFragment).commit();
-                } else {
-                    Log.e(TAG, "Flashcard not found");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                Log.e(TAG, "Database error: " + error.getMessage());
-            }
-        });
+        FirebaseFirestore db = FirebaseFirestore.getInstance();  // firestore instance
+        db.collection("flashcards")
+                .document(flashcardId).get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        questionText = documentSnapshot.getString("question");
+                        answerText = documentSnapshot.getString("answer");
+                        FlashcardFragment flashcardFragment = FlashcardFragment.newInstance(questionText, answerText);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_flashcard, flashcardFragment).commit();
+                    } else {
+                        Log.e(TAG, "Flashcard not found");
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Firestore error: " + e.getMessage()));
     }
+
 
     /**
      * TESTING: A test method to create a local flashcard to display in the activity fragment.

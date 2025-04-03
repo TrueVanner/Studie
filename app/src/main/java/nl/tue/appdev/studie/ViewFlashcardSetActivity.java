@@ -10,14 +10,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,11 +26,11 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
 
     private String groupId;
     private String flashcardSetId;
-    private ArrayList<String> flashcardIds = new ArrayList<>();
     private List<Flashcard> flashcards = new ArrayList<>();
     private boolean isShowingQuestion = true;
     private int currentFlashcardIndex = 0;
-
+    private int loadedFlashcardCount = 0;
+    private int expectedFlashcardCount = 0;
     private TextView questionNrTextView;
     private TextView flashcardStateTextView;
     private ImageButton flipButton;
@@ -71,13 +68,10 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         flashcardSetId = intent.getStringExtra("flashcardSetId");
 
         if (flashcardSetId != null) {
-//            loadFlashcardSet(flashcardSetId);
+            loadFlashcardSet(flashcardSetId);
         } else {
             Log.e(TAG, "No flashcard set ID");
         }
-
-        createTestFlashcardSet();
-        loadFlashcard(currentFlashcardIndex);
     }
 
     /**
@@ -85,32 +79,56 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      * @param flashcardSetId passed down flashcard set id with the intent, to fetch from the database
      */
     private void loadFlashcardSet(String flashcardSetId) {
-        DatabaseReference flashcardSetRef = FirebaseDatabase.getInstance().getReference("flashcard_sets").child(flashcardSetId);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference flashcardSetRef = db.collection("flashcardsets").document(flashcardSetId);
 
-        flashcardSetRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot flashcardSnapshot : snapshot.child("flashcards").getChildren()) { // get flashcards from flashcard set
-                        String id = flashcardSnapshot.child("flashcard_id").getValue(String.class);
-                        String question = flashcardSnapshot.child("question").getValue(String.class);
-                        String answer = flashcardSnapshot.child("answer").getValue(String.class);
-                        String author = flashcardSnapshot.child("author").getValue(String.class);
-                        Flashcard flashcard = new Flashcard(id, question, answer, author);
-                        flashcards.add(flashcard);
+        flashcardSetRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                Log.e(TAG, "DocumentSnapshot Data: " + documentSnapshot.getData());
+
+                List<String> flashcardIds = (List<String>) documentSnapshot.get("flashcards");
+
+                if (flashcardIds != null) {
+                    flashcards.clear();
+                    expectedFlashcardCount = flashcardIds.size();
+
+                    for (int i = 0; i < flashcardIds.size(); i++) {
+                        String flashcardId = flashcardIds.get(i);
+                        int flashcardIndex = i;
+
+                        FirebaseFirestore db2 = FirebaseFirestore.getInstance();
+                        DocumentReference flashcardRef = db2.collection("flashcards").document(flashcardId);
+
+                        flashcardRef.get().addOnSuccessListener(documentSnapshot2 -> {
+                            if (documentSnapshot2.exists()) {
+                                String question = documentSnapshot2.getString("question");
+                                String answer = documentSnapshot2.getString("answer");
+                                String author = documentSnapshot2.getString("author");
+
+                                Flashcard flashcard = new Flashcard(flashcardId, question, answer, author);
+                                flashcards.add(flashcardIndex, flashcard);
+
+                                // Update counter
+                                loadedFlashcardCount++;
+
+                                // Check if all flashcards have been loaded
+                                if (loadedFlashcardCount == expectedFlashcardCount) {
+                                    loadFlashcard(0); // Load the first flashcard
+                                }
+                            } else {
+                                Log.e(TAG, "Flashcard with ID <" + flashcardId + "> not found in the database");
+                            }
+                        }).addOnFailureListener(e -> Log.e(TAG, "Error fetching flashcard: " + flashcardId, e));
                     }
-                    loadFlashcard(currentFlashcardIndex); // load the first flashcard initially
                 } else {
-                    Log.e(TAG, "Flashcard set not found");
+                    Log.e(TAG, "Flashcards field is null or missing");
                 }
+            } else {
+                Log.e(TAG, "Flashcard set not found in the database");
             }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                Log.e(TAG, "Database error: " + error.getMessage());
-            }
-        });
+        }).addOnFailureListener(e -> Log.e(TAG, "Error fetching flashcard set", e));
     }
+
 
     /**
      * Loads the flashcard upon the flashcard view fragment, based on passed argument of selected flashcard index in the set.

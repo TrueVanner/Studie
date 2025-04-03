@@ -9,6 +9,10 @@ public class Flashcard {
     // TODO: implement attachments
     // private ? attachment;
 
+    public Flashcard() {
+
+    }
+
     public Flashcard(String id,
                      String question,
                      String answer,
