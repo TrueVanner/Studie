@@ -11,6 +11,8 @@ public class Groups {
     private List<String> flashcardsets;
     private List<String> notes;
 
+    private String qrCode;
+
     public Groups(){
 
     }
@@ -21,6 +23,7 @@ public class Groups {
         this.flashcards = new ArrayList<>();
         this.flashcardsets = new ArrayList<>();
         this.notes = new ArrayList<>();
+        this.qrCode = "";
     }
     public String getname() {
         return name;
@@ -69,5 +72,13 @@ public class Groups {
 
     public void setNotes(List<String> notes) {
         this.notes = notes;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 }

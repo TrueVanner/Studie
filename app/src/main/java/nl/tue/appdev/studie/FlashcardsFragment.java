@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
@@ -43,43 +44,18 @@ public class FlashcardsFragment extends Fragment {
     private LinearLayout flashcardContainer;
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private Map<String, Object> groupData;
+    private Map<String, Object> userDocument;
     private String groupId;
-    private final ArrayList<Flashcard> flashcards = new ArrayList<>();
+    private ArrayList<String> flashcard_ids = new ArrayList<>();
+    private ArrayList<Flashcard> flashcards = new ArrayList<>();
 
-    private boolean startedLoading = false;
-    public void retrieveFlashcards() {
-        startedLoading = true;
-        // Clear the list
-        flashcards.clear();
+    private boolean refresh = true;
 
+    public void retrieveFlashcardData() {
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Get flashcards of the group
-        db.collection("groups").document(groupId)
-                .get(Source.SERVER)
-                .addOnCompleteListener(requireActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            groupData = document.getData();
-                            assert groupData != null;
-                            retrieveFlashcardData((List<String>) groupData.get("flashcards"));
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                });
-    }
-    public void retrieveFlashcardData(List<String> flashcardIds) {
-        flashcards.clear();
-
-        for (String flashcard_id : flashcardIds) {
+        for (String flashcard_id : flashcard_ids) {
             // Get flashcard data using the flashcard ID
             db.collection("flashcards")
                 .document(flashcard_id)
@@ -89,14 +65,15 @@ public class FlashcardsFragment extends Fragment {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            groupData = document.getData();
-                            assert groupData != null;
-                            String question = (String) groupData.get("question");
-                            String answer = (String) groupData.get("answer");
-                            String author = (String) groupData.get("author");
+                            userDocument = document.getData();
+                            assert userDocument != null;
+                            String question = (String) userDocument.get("question");
+                            String answer = (String) userDocument.get("answer");
+                            String author = (String) userDocument.get("author");
                             Log.d(TAG,  question + " " + answer + " " + author);
 
-                            flashcards.add(new Flashcard(flashcard_id, question, answer, author));
+                            Flashcard f = new Flashcard(flashcard_id, question, answer, author);
+                            flashcards.add(f);
 
                             displayFlashcards();
                         } else {
@@ -107,9 +84,36 @@ public class FlashcardsFragment extends Fragment {
                     }
             });
         }
+    }
 
-        // i know this isn't async but should be good enough
-        startedLoading = false;
+    public void retrieveFlashcards() {
+        // Clear the list
+        flashcards = new ArrayList<>();
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Get flashcards of the group
+        DocumentReference docRef = db.collection("groups").document(groupId);
+        docRef.get(Source.SERVER).addOnCompleteListener(requireActivity(), task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    userDocument = document.getData();
+                    assert userDocument != null;
+                    List<String> flashcard_ids_list = (List<String>) userDocument.get("flashcards");
+                    flashcard_ids = new ArrayList<>(flashcard_ids_list);
+                    Log.d(TAG, String.valueOf(flashcard_ids));
+
+                    retrieveFlashcardData();
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
     }
 
     public void displayFlashcards() {
@@ -248,14 +252,13 @@ public class FlashcardsFragment extends Fragment {
             groupId = getArguments().getString("id");
             Log.d(TAG, "Received Data: " + groupId);
         }
-
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        refresh = false;
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_flashcards, container, false);
     }
@@ -277,6 +280,11 @@ public class FlashcardsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(!startedLoading) { retrieveFlashcards(); }
+
+        if (refresh) {
+            retrieveFlashcards();
+        } else {
+            refresh = true;
+        }
     }
 }
