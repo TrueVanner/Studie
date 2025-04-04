@@ -26,8 +26,10 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_qr_code_content);
 
+        // Initialize Firestore instance
         db = FirebaseFirestore.getInstance();
 
+        // Find views by their IDs
         TextView groupNameTextView = findViewById(R.id.group_name_text_view);
         ImageButton backButton = findViewById(R.id.join_group_back_button);
         Button noButton = findViewById(R.id.button_no);
@@ -35,30 +37,32 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
 
         // Get the scanned content from the intent
         String scannedContent = getIntent().getStringExtra("SCANNED_CONTENT");
-        //Toast.makeText(this, "scannedContent: " + scannedContent, Toast.LENGTH_LONG).show();
         Log.d("DisplayQRCodeContentActivity", "Received SCANNED_CONTENT: " + scannedContent);
         if (scannedContent != null) {
+            // Extract group name and ID from the scanned content
             groupName = extractGroupName(scannedContent);
             groupNameTextView.setText(groupName);
-            // Extract group ID from the scanned content
             groupId = extractGroupIdFromScannedContent(scannedContent);
-            //Toast.makeText(this, "Retrieved Group ID: " + groupId, Toast.LENGTH_LONG).show();
         } else {
             groupNameTextView.setText("Group name not found");
         }
 
+        // Set onClick listener for the back button to finish the activity
         backButton.setOnClickListener(v -> {
             finish();
         });
 
+        // Set onClick listener for the no button to start JoinActivity
         noButton.setOnClickListener(v -> {
             Intent intent = new Intent(DisplayQRCodeContentActivity.this, JoinActivity.class);
             startActivity(intent);
         });
 
+        // Set onClick listener for the yes button to join the group
         yesButton.setOnClickListener(v -> joinGroup());
     }
 
+    // Method to extract the group name from the scanned content
     private String extractGroupName(String scannedContent) {
         if (scannedContent.startsWith("Name: ")) {
             String[] parts = scannedContent.split(", ID: ");
@@ -67,6 +71,7 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
         return scannedContent;
     }
 
+    // Method to extract the group ID from the scanned content
     private String extractGroupIdFromScannedContent(String scannedContent) {
         if (scannedContent.contains(", ID: ")) {
             String[] parts = scannedContent.split(", ID: ");
@@ -77,6 +82,7 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
         return null;
     }
 
+    // Method to join the group
     private void joinGroup() {
         if (groupId != null) {
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -86,7 +92,6 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
             userRef.update("groups." + groupId, groupName)
                     .addOnSuccessListener(aVoid -> {
                         Log.d("DisplayQRCodeContentActivity", "User added to group successfully");
-                        //Toast.makeText(DisplayQRCodeContentActivity.this, groupName + " joined!", Toast.LENGTH_SHORT).show();
 
                         // Redirect to the group's home view
                         Intent intent = new Intent(DisplayQRCodeContentActivity.this, GroupActivity.class);
@@ -95,7 +100,6 @@ public class DisplayQRCodeContentActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(e -> {
                         Log.e("DisplayQRCodeContentActivity", "Error adding user to group", e);
-                        //Toast.makeText(DisplayQRCodeContentActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
                     });
         } else {
             Log.e("DisplayQRCodeContentActivity", "Group ID is null");

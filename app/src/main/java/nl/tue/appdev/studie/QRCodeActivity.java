@@ -31,22 +31,20 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr_code);
 
-        // get group id from group screen intent
+        // Get group id from group screen intent
         Intent intent = getIntent();
         groupId = intent.getStringExtra("id");
 
-        // Add back button
+        // Add back button and set its click listener
         ImageButton back = findViewById(R.id.qr_code_back_button);
         back.setOnClickListener(this);
 
+        // Initialize views and Firestore instance
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
         db = FirebaseFirestore.getInstance();
         groupNameTextView = findViewById(R.id.group_name_text_view);
 
-//        // Generate QR code with a static string
-//        String staticString = "exampleStaticString";
-//        generateQRCode(staticString);
-
+        // Retrieve group ID and generate QR code
         retrieveGroupUID2AndGenerateQRCode();
     }
 
@@ -54,12 +52,14 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.qr_code_back_button) {
+            // Navigate to ManageGroupActivity
             Intent toManage = new Intent(QRCodeActivity.this, ManageGroupActivity.class);
             toManage.putExtra("id", groupId);
             startActivity(toManage);
         }
     }
 
+    // Method to retrieve group ID and generate QR code
     private void retrieveGroupUID2AndGenerateQRCode() {
         DocumentReference docRef = db.collection("groups").document(groupId);
         db.runTransaction((Transaction.Function<Void>) transaction -> {
@@ -84,6 +84,7 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    // Method to generate QR code
     private void generateQRCode(String text) {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         try {
@@ -94,6 +95,7 @@ public class QRCodeActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    // Method to convert BitMatrix to Bitmap
     private Bitmap toBitmap(com.google.zxing.common.BitMatrix matrix) {
         int width = matrix.getWidth();
         int height = matrix.getHeight();
