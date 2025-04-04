@@ -39,6 +39,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onStart() {
         super.onStart();
+        //If the user has previously logged into the app, send them directly to the welcome page
+        //so they don't have to login again
         if (mAuth.getCurrentUser() != null) {
             Intent toHome = new Intent(WelcomeActivity.this, HomeActivity.class);
             startActivity(toHome);
@@ -51,10 +53,13 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         Intent toLogin = new Intent(WelcomeActivity.this, LoginActivity.class);
         Intent toSignup = new Intent(WelcomeActivity.this, SignupActivity.class);
         if (id == R.id.button_login) {
+            //If the login button is pressed, send the user to the login activity
             startActivity(toLogin);
         } else if (id == R.id.button_signup) {
+            //If the signup button is pressed, send the user to the signup activity
             startActivity(toSignup);
         } else {
+            //If the app receives an unknown onclick, throw the following error message
             String toastText = "Undefined request";
             Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
