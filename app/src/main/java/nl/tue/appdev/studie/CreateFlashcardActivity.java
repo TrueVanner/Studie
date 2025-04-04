@@ -47,19 +47,24 @@ public class CreateFlashcardActivity extends AppCompatActivity {
         AtomicBoolean addedToGroup = new AtomicBoolean(false);
 
         // Reference to the document in the "flashcardsets" collection
-        db.collection("flashcardsets")
-                .document(setId)
-                .update("flashcards", FieldValue.arrayUnion(cardId))
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Card ID added successfully!");
-                    addedToSet.set(true);
-                    checkIfBothFinished(addedToSet, addedToGroup);
-                })
-                .addOnFailureListener(e -> {
-                    Log.d(TAG, "Error adding card ID: " + e.getMessage());
-                    addedToSet.set(true);
-                    checkIfBothFinished(addedToSet, addedToGroup);
-                });
+        if (!(setId.equals("None"))) {
+            db.collection("flashcardsets")
+                    .document(setId)
+                    .update("flashcards", FieldValue.arrayUnion(cardId))
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Card ID added successfully!");
+                        addedToSet.set(true);
+                        checkIfBothFinished(addedToSet, addedToGroup);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.d(TAG, "Error adding card ID: " + e.getMessage());
+                        addedToSet.set(true);
+                        checkIfBothFinished(addedToSet, addedToGroup);
+                    });
+        } else {
+            // If no set is selected, skip this section
+            addedToSet.set(true);
+        }
 
         // Reference to the document in the "groups" collection
         db.collection("groups")
@@ -78,9 +83,6 @@ public class CreateFlashcardActivity extends AppCompatActivity {
     }
 
     public void createFlashcard(String question, String answer, String author, String setTitle) {
-        // Get the ID of the set that the new flashcard should be in
-        String setId = titleToId.get(setTitle);
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Create a flashcard object
@@ -96,6 +98,12 @@ public class CreateFlashcardActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentReference -> {
                     String cardId = documentReference.getId();
                     Log.d(TAG, "Flashcard added with ID: " + documentReference.getId());
+
+                    // Get the ID of the set that the new flashcard should be in
+                    String setId = "None";
+                    if (!(setTitle.equals("None"))) {
+                        setId = titleToId.get(setTitle);
+                    }
                     addFlashcardToSetAndGroup(cardId, setId);
                 })
                 .addOnFailureListener(e -> {
@@ -109,7 +117,7 @@ public class CreateFlashcardActivity extends AppCompatActivity {
         EditText answerText = findViewById(R.id.answer_edit_text);
         String answer = answerText.getText().toString();
         Spinner spinnerSets = findViewById(R.id.spinner_sets);
-        String setId = spinnerSets.getSelectedItem().toString();
+        String setTitle = spinnerSets.getSelectedItem().toString();
 
         // Get author name
         FirebaseUser user;
@@ -131,9 +139,9 @@ public class CreateFlashcardActivity extends AppCompatActivity {
                             assert userDocument != null;
                             String author = (String) userDocument.get("name");
                             assert author != null;
-                            Log.d(TAG, question + " " + answer + " " + author + " " + setId);
+                            Log.d(TAG, question + " " + answer + " " + author + " " + setTitle);
 
-                            createFlashcard(question, answer, author, setId);
+                            createFlashcard(question, answer, author, setTitle);
                         } else {
                             Log.e(TAG, "No such document");
                         }
@@ -151,6 +159,8 @@ public class CreateFlashcardActivity extends AppCompatActivity {
     }
 
     public void retrieveFlashcardsetData() {
+        sets.add("None");
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
