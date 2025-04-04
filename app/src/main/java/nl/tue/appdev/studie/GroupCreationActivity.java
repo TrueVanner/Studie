@@ -81,7 +81,6 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     //Basically onClick, but for checks when a toggle button's check state is changed
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        //Prepare for an unholy abomination brought to you by sleep deprivation
         int id = buttonView.getId();
     //Sees if changing the check state would make both buttons be on or off:
         //If the check state is gonna change for the private toggle button
@@ -117,32 +116,31 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
         Intent toHome = new Intent(GroupCreationActivity.this, HomeActivity.class);
         if(id==R.id.button_create_group) {
             if (name.isBlank()) {
+                //If the user tries to create a group without a name, update the UI to give them a warning
                 updateUI(UpdateType.GROUPNAME_EMPTY);
-            } else if (!togglePublic.isChecked() && !togglePrivate.isChecked()
+            }
+            else if (!togglePublic.isChecked() && !togglePrivate.isChecked()
                     || togglePublic.isChecked() && togglePrivate.isChecked()) {
+                //If the user somehow manages to toggle both the public and private button, or neither public nor private,
+                //update the UI to throw a message
                 updateUI(UpdateType.PRIVATE_AND_PUBLIC);
             } else {
+                //If nothing goes wrong, attempt to create the group
                 tryCreateGroup(name, code, togglePublic.isChecked());
             }
         }
         else if(id==R.id.create_group_back_button){
+            //If the user presses the back arrow, it brings them to the home page
             startActivity(toHome);
-        } else {
-//            String toastText = "milbei";
-//            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
     }
-
+    //Function to create and add a group to the database with the parameters given by the user
     private void addDataToFirestore(String name, String code, boolean isPublic){
-        Intent toHome = new Intent(GroupCreationActivity.this, HomeActivity.class);
         Intent toGroup = new Intent(GroupCreationActivity.this, GroupActivity.class);
         CollectionReference dbGroups = db.collection("groups");
-
         Groups groups = new Groups(name, code, isPublic);
-
         dbGroups.add(groups).addOnSuccessListener(documentReference -> {
-//                Toast.makeText(GroupCreationActivity.this, "Group created successfully!",
-//                Toast.LENGTH_SHORT).show();
+                //Using a hashmap to retrieve all the group information so that the given groupID is of the created group's
                 groupGet.put("code", code);
                 groupGet.put("flashcards", flashcards);
                 groupGet.put("flashcardsets", flashcards);
@@ -152,7 +150,9 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
                 DocumentReference groupDocRef = groupRef.document();
                 groupDocRef.set(groupGet);
                 String groupId=groupDocRef.getId();
+                //Update the user's groups array so that it contains the newly created group
                 userRef.update("groups." + groupId, name);
+                //After group creation, send the user to their newly created group's view
                 toGroup.putExtra("id", groupId);
                 startActivity(toGroup);
         });
@@ -169,7 +169,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
                 groupName.setError("Group name already exists.");
                 break;
             case PRIVATE_AND_PUBLIC:
-                Toast.makeText(this, "You fucked smth up", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -185,6 +185,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
                             Log.d(TAG, document.getId() + " => " + document.getData());
                             groupnameAvailable = false;
                         }
+
                         if (groupnameAvailable) {
                             addDataToFirestore(name, code, isPublic);
                         } else {
@@ -192,7 +193,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
                             groupnameAvailable = true;
                         }
                     } else {
-                        Log.e(TAG, "Query failed");
+                        Log.d(TAG, "Query failed");
                     }
                 });
     }

@@ -2,7 +2,7 @@ package nl.tue.appdev.studie;
 
 import java.util.ArrayList;
 import java.util.List;
-
+//Public class used to add the group that's trying to be created using the GroupCreationActivity into the database
 public class Groups {
     private String name;
     private String code;
@@ -10,8 +10,6 @@ public class Groups {
     private List<String> flashcards;
     private List<String> flashcardsets;
     private List<String> notes;
-
-    private String qrCode;
 
     public Groups(){
 
@@ -23,7 +21,6 @@ public class Groups {
         this.flashcards = new ArrayList<>();
         this.flashcardsets = new ArrayList<>();
         this.notes = new ArrayList<>();
-        this.qrCode = "";
     }
     public String getname() {
         return name;
@@ -37,7 +34,6 @@ public class Groups {
         return code;
     }
 
-    // setter method for all variables.
     public void setcode(String code) {
         this.code = code;
     }
@@ -72,13 +68,5 @@ public class Groups {
 
     public void setNotes(List<String> notes) {
         this.notes = notes;
-    }
-
-    public String getQrCode() {
-        return qrCode;
-    }
-
-    public void setQrCode(String qrCode) {
-        this.qrCode = qrCode;
     }
 }
