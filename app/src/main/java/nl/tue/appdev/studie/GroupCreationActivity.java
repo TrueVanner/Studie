@@ -32,19 +32,12 @@ import java.util.Map;
 
 public class GroupCreationActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
     private static final String TAG = "GroupCreationActivity";
-    private ToggleButton togglePrivate;
-    private ToggleButton togglePublic;
+    public ToggleButton togglePrivate;
+    public ToggleButton togglePublic;
     private EditText groupName;
     private EditText groupCode;
     private final ArrayList<Flashcard> flashcards = new ArrayList<>();
-    private final FirebaseFirestore db=FirebaseFirestore.getInstance();
     private boolean groupnameAvailable = true;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    FirebaseUser user = mAuth.getCurrentUser();
-    String userID = user.getUid();
-    DocumentReference userRef = db.collection("users").document(userID);
-    DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReference();
-    CollectionReference groupRef=FirebaseFirestore.getInstance().collection("groups");
     Map<String,Object> groupGet = new HashMap<>();
 
     @Override
@@ -58,9 +51,6 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
             return insets;
         });
 
-        if(userID.isEmpty()){
-            userID="null_user";
-        }
         groupName=findViewById(R.id.group_name);
         groupCode =findViewById(R.id.group_course_code);
 
@@ -136,6 +126,13 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     }
     //Function to create and add a group to the database with the parameters given by the user
     private void addDataToFirestore(String name, String code, boolean isPublic){
+        final FirebaseFirestore db=FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        assert user != null;
+        String userID = user.getUid();
+        DocumentReference userRef = db.collection("users").document(userID);
+        CollectionReference groupRef=FirebaseFirestore.getInstance().collection("groups");
         Intent toGroup = new Intent(GroupCreationActivity.this, GroupActivity.class);
         CollectionReference dbGroups = db.collection("groups");
         Groups groups = new Groups(name, code, isPublic);
@@ -175,6 +172,7 @@ public class GroupCreationActivity extends AppCompatActivity implements View.OnC
     }
 
     private void tryCreateGroup(String name, String code, boolean isPublic) {
+        final FirebaseFirestore db=FirebaseFirestore.getInstance();
         db.collection("groups")
                 .whereEqualTo("name", name)
                 .get(Source.SERVER)

@@ -35,29 +35,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        //Firebase declaration
         mAuth = FirebaseAuth.getInstance();
-
+        //UI elements declarations
         emailInput = findViewById(R.id.login_input_email);
         passwordInput = findViewById(R.id.login_input_password);
 
         ImageButton login = (ImageButton) findViewById(R.id.button_log_in);
         TextView gotoSignup = (TextView) findViewById(R.id.hyperlink_to_signup);
-
+        //Setting OnClickListener
         login.setOnClickListener(this);
         gotoSignup.setOnClickListener(this);
     }
-
     public enum UpdateType { BAD_EMAIL, BAD_PASSWORD, LOGIN_FAILED }
 
     private void updateUI(UpdateType updateType) {
+        //Switch statement to check if in the filled in fields-
         switch(updateType) {
+            //-the email is empty
             case BAD_EMAIL:
                 emailInput.setError("Please enter your email address.");
                 break;
+            //-the password is empty
             case BAD_PASSWORD:
                 passwordInput.setError("Please enter your password.");
                 break;
+            //If the email isn't in the database or the password doesn't correspond
+            //to the email
             case LOGIN_FAILED:
                 break;
         }
@@ -99,6 +103,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         }
                     });
         } else if (id == R.id.hyperlink_to_signup) {
+            //If the user clicks on the "Sign up!" clickable text, they get sent to
+            //the signup activity
             startActivity(toSignup);
         }
     }

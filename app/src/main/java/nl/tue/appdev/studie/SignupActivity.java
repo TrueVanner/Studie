@@ -45,39 +45,45 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        //Firebase authentication declaration
         mAuth = FirebaseAuth.getInstance();
-
+        //UI elements declarations
         nameInput = findViewById(R.id.input_name);
         emailInput = findViewById(R.id.signup_input_email);
         passwordInput = findViewById(R.id.signup_input_password);
         ImageButton signup = findViewById(R.id.button_sign_up);
         TextView login = findViewById(R.id.hyperlink_to_login);
-
+        //Setting OnClickListener
         signup.setOnClickListener(this);
         login.setOnClickListener(this);
     }
-
     enum UpdateType { BAD_NAME, BAD_PASSWORD, BAD_EMAIL, BAD_AUTH, INSECURE_PW, USERNAME_TAKEN }
 
     private void updateUI(UpdateType updateType) {
+        //Switch case to check-
         switch(updateType) {
+            //-if the name field is empty
             case BAD_NAME:
                 nameInput.setError("Name can't be empty!");
                 break;
+            //-if the password field is empty
             case BAD_PASSWORD:
                 passwordInput.setError("Password can't be empty!");
                 break;
+            //-if the email field is empty
             case BAD_EMAIL:
                 emailInput.setError("Email can't be empty!");
                 break;
             case BAD_AUTH:
+            //-if the user can be signed up or not
                 Toast.makeText(SignupActivity.this, "Authentication failed.",
                         Toast.LENGTH_SHORT).show();
                 break;
+            //-if the name the user is trying to set is already in the firebase
             case USERNAME_TAKEN:
                 nameInput.setError("This username is already used by another user.");
                 break;
+            //-if the password that was put in doesn't meet the given parameters
             case INSECURE_PW:
                 passwordInput.setError("Password is insecure.");
         }
@@ -116,9 +122,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void checkUsernameAndCreate() {
+        //Retrieve the inputs from the edittext boxes and turn them into strings
         String name = nameInput.getText().toString();
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
+        //Firebase Firestore declaration
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
             .whereEqualTo("name", name)
@@ -147,7 +155,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         int id = v.getId();
         Intent tologin = new Intent(SignupActivity.this, LoginActivity.class);
         if (id == R.id.button_sign_up) {
-            // Get user credentials
+            //If the sign up button is clicked, retrieve the inputs
+            //from the edittext boxes and turn them into strings
             String name = nameInput.getText().toString();
             String email = emailInput.getText().toString();
             String password = passwordInput.getText().toString();
@@ -172,9 +181,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
             checkUsernameAndCreate(); // Check if the username is available and create account
 
-        } else if (id==R.id.hyperlink_to_login){ // Go to login button pressed
+        } else if (id==R.id.hyperlink_to_login){
+            //If the user clicks on the "Log in!" clickable text, they get sent to
+            //the login activity
             startActivity(tologin);
-        } else { // Something weird happened
+        } else {
+            //If the app receives an unknown onclick, throw the following error message
             Toast.makeText(this, "Undefined request", Toast.LENGTH_SHORT).show();
         }
     }

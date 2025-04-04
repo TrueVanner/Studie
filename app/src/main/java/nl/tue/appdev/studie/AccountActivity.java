@@ -42,16 +42,16 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        //Declarations for the UI elements
         ImageButton back = findViewById(R.id.account_back_button);
         Button logout = findViewById(R.id.account_logout_button);
-
+        //setting OnClickListeners
         back.setOnClickListener(this);
         logout.setOnClickListener(this);
 
         TextView nameView = findViewById(R.id.account_name_filled);
         TextView emailView = findViewById(R.id.account_email_filled);
-
+        //Setting up the firebase declarations
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -94,11 +94,15 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         Intent toHome = new Intent(AccountActivity.this, HomeActivity.class);
         Intent toWelcome = new Intent(AccountActivity.this, WelcomeActivity.class);
         if (id == R.id.account_back_button) {
+            //If the back button is pressed, the user is sent to the home activity
             startActivity(toHome);
         } else if (id == R.id.account_logout_button) {
+            //If the logout button is pressed, the user gets signed out and is returned
+            //to the welcome activity
             mAuth.signOut();
             startActivity(toWelcome);
         } else {
+            //If the app receives an unknown onclick, throw the following error message
             String toastText = "Undefined request";
             Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
         }
