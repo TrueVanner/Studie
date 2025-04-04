@@ -9,7 +9,15 @@
     <string name="send">Send</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-
+    <string name="no_camera_perms">Grant camera permissions manually through settings to enable QR code scanning.</string>
+    <string name="go_to_camera_settings">Go to camera settings</string>
+    <string name="welcome_message"><font size="40"><b>Welcome!</b> \n</font><font size="20">Sign in or create an account \n to continue</font></string>
+    <string name="sign_up_hyperlink">Not a member yet? <font color='#25A7F2'>Sign up!</font></string>
+    <string name="log_in_hyperlink">Already have an account? <font color='#25A7F2'>Log in!</font></string>
+    <string name="login_message"><font size="50"><b>Login</b> \n</font><font size="20">Sign in to continue</font></string>
+    <string name="upload">Upload</string>
+    <string name="upload_notes">Upload Notes</string>
+    <string name="select_file_hint">Select file to upload!</string>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
@@ -46,4 +54,41 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="title_activity_group">GroupActivity</string>
+    <string name="notes_string">Notes</string>
+    <string name="flashcards_string">Flashcards</string>
+    <string name="sets_string">Sets</string>
+
+    <string name="home_account">Account</string>
+    <string name="home_create">Create</string>
+    <string name="home_join">Join</string>
+
+    <string name="sign_up">Sign up</string>
+
+    <string name="home">Home</string>
+    <string name="home_search">Search your groups…</string>
+    <string name="join_search">Search public groups…</string>
+
+    <string name="account">Account</string>
+    <string name="account_name">Name</string>
+    <string name="account_email">E-mail</string>
+    <string name="logout">Log Out</string>
+    <string name="title_activity_join">JoinActivity</string>
+
+    <string name="course_code"><b>Course </b>(optional):</string>
+
+    <string name="join">Join</string>
+
+    <string name="fc_create">Create</string>
+    <string name="note_upload">Upload</string>
+
+    <string name="manage">Manage</string>
+    <string name="show_qr">Show group QR code</string>
+
+    <string-array name="spinner_choices">
+        <item>Choose Flashcards Set...</item>
+        <item>Set 1</item>
+        <item>Set 2</item>
+        <item>Set 3</item>
+    </string-array>
 </resources>

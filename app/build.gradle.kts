@@ -1,9 +1,13 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 //    id("com.android.application") version "8.1.4" apply false
     id("org.sonarqube") version "6.0.1.5171"
     id("jacoco")
     alias(libs.plugins.google.gms.google.services)
+
 }
 
 android {
@@ -11,6 +15,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
+        android.buildFeatures.buildConfig = true
         applicationId = "nl.tue.appdev.studie"
         minSdk = 24
         targetSdk = 35
@@ -18,6 +23,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val credentialsProperties = Properties()
+        credentialsProperties.load(FileInputStream(rootProject.file("credentials.properties")))
+
+        buildConfigField("String", "FTP_HOSTNAME", credentialsProperties.getProperty("FTP_HOSTNAME"))
+        buildConfigField("String", "FTP_USERNAME", credentialsProperties.getProperty("FTP_USERNAME"))
+        buildConfigField("String", "FTP_PASSWORD", credentialsProperties.getProperty("FTP_PASSWORD"))
     }
 
     buildTypes {
@@ -39,6 +51,22 @@ android {
 }
 
 dependencies {
+    // connection with file server
+    implementation(libs.commons.net)
+
+    // pdf viewer
+    implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.1")
+
+    // auth
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+
+    // firestore
+    implementation(libs.firebase.firestore)
+
+    // qr code
+    implementation(libs.zxing.core)
+    implementation(libs.zxing.android.embedded)
 
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -46,6 +74,9 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.database)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -80,8 +111,10 @@ sonar {
 val ignoredByJacoco = mutableListOf<String>()
 val fileFilter = mutableListOf<String>()
 val buildKotlinClasses = "/tmp/kotlin-classes/debug"
-val buildJavaClasses = "/intermediates/javac/debug/classes"
-val testExecutionFile = "/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+val buildJavaClasses = "/intermediates/javac/debug/compileDebugJavaWithJavac/classes"
+//val buildJavaClasses = "/intermediates/javac/debug/classes"
+val testExecutionFile = "/outputs/code_coverage/debugUnitTest/testDebugUnitTest.exec"
+//val testExecutionFile = "/jacoco/testDebugUnitTest.exec"
 
 // List of files that can be ignored for test coverage
 val coverageExclusions = listOf(
@@ -91,7 +124,7 @@ val coverageExclusions = listOf(
 )
 
 // Apply additional build steps to sub-projects
-subprojects.forEach() { project ->
+subprojects.forEach { project ->
     if (!ignoredByJacoco.contains(project.name)) {
         project.pluginManager.apply("jacoco")
 
@@ -127,6 +160,8 @@ subprojects.forEach() { project ->
 
 // Root task that generates an aggregated Jacoco test coverage report for all sub-projects
 tasks.register("jacocoFullReport", JacocoReport::class.java) {
+//    dependsOn(includedProjects.map { "${it.name}:jacocoReport" })
+
     group = "Reporting"
     description = "Generates an aggregate report from all subprojects"
 
