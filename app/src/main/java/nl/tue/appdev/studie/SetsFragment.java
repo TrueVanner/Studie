@@ -241,7 +241,7 @@ public class SetsFragment extends Fragment {
                 intent.putExtra("flashcardSetId", id);
                 intent.putExtra("group_id", groupId);
                 startActivity(intent);
-//                Toast.makeText(getContext(), "Flashcardset " + id + " clicked", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "Flashcardset " + id + " clicked", Toast.LENGTH_SHORT).show();
             });
         }
     }

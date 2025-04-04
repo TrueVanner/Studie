@@ -19,7 +19,7 @@ public class ExampleUnitTest {
     public void test_note_constructor() {
         Note note = new Note("a", "b","c","d");
         assertEquals("b", note.getTitle());
-        assertEquals("c", note.getAuthor());
+        assertEquals("c", note.getAuthorId());
         assertEquals("d", note.getGroupID());
         assertEquals("a", note.getFilename());
     }

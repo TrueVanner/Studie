@@ -31,6 +31,9 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
 
     private String name;
 
+    private TextView nameView;
+    private TextView emailView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,10 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        setupUI();
+    }
+
+    public void setupUI() {
         //Declarations for the UI elements
         ImageButton back = findViewById(R.id.account_back_button);
         Button logout = findViewById(R.id.account_logout_button);
@@ -49,8 +56,9 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         back.setOnClickListener(this);
         logout.setOnClickListener(this);
 
-        TextView nameView = findViewById(R.id.account_name_filled);
-        TextView emailView = findViewById(R.id.account_email_filled);
+        nameView = findViewById(R.id.account_name_filled);
+        emailView = findViewById(R.id.account_email_filled);
+
         //Setting up the firebase declarations
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -61,31 +69,30 @@ public class AccountActivity extends AppCompatActivity implements View.OnClickLi
         assert user != null;
         String userID = user.getUid();
         db.collection("users")
-            .document(userID)
-            .get(Source.SERVER)
-            .addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        Map<String, Object> userDocument = document.getData();
-                        assert userDocument != null;
-                        name = (String) userDocument.get("name");
-                        assert name != null;
-                        nameView.setText(name);
-                        Log.d(TAG, name);
+                .document(userID)
+                .get(Source.SERVER)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            Map<String, Object> userDocument = document.getData();
+                            assert userDocument != null;
+                            name = (String) userDocument.get("name");
+                            assert name != null;
+                            nameView.setText(name);
+                            Log.d(TAG, name);
+                        } else {
+                            Log.e(TAG, "No such document");
+                        }
                     } else {
-                        Log.e(TAG, "No such document");
+                        Log.e(TAG, "get failed with ", task.getException());
                     }
-                } else {
-                    Log.e(TAG, "get failed with ", task.getException());
-                }
-        });
+                });
         // Update email view
         String email;
         email = user.getEmail();
         emailView.setText(email);
-
     }
 
     @Override
