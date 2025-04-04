@@ -79,12 +79,7 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
         loadFlashcards();
 
         createButton.setOnClickListener(v -> createFlashcardSet());
-        backButton.setOnClickListener(v -> {
-            Intent back = new Intent(CreateFlashcardSetActivity.this, GroupActivity.class);
-            back.putExtra("group_id", groupId);
-            startActivity(back);
-            finish();
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     /**
