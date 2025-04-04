@@ -51,12 +51,21 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_set_create);
-
+        // redirect to login screen if user is not logged in
+        if (groupId == null) {
+            Toast.makeText(this, "Group ID not found", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        // assignation of the screen elements in flashcard set create view
         setNameInput = findViewById(R.id.fc_set_name_input);
         recyclerView = findViewById(R.id.fc_set_recycler_view);
         ImageButton createButton = findViewById(R.id.fc_set_create_button);
         ImageButton backButton = findViewById(R.id.fc_set_create_back_button);
-
+        // buttons onClick handlers
+        createButton.setOnClickListener(v -> createFlashcardSet());
+        backButton.setOnClickListener(v -> finish());
+        // assignation and initialization of set create components
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         flashcardList = new ArrayList<>();
         adapter = new FlashcardSelectAdapter(flashcardList);
@@ -66,20 +75,12 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         Intent intent = getIntent();
+        // retrieve the id of the group that the set is in
         if (intent != null && intent.hasExtra("group_id")) {
             groupId = intent.getStringExtra("group_id");
         }
 
-        if (groupId == null) {
-            Toast.makeText(this, "Group ID not found", Toast.LENGTH_SHORT).show();
-//            finish();
-            return;
-        }
-
         loadFlashcards();
-
-        createButton.setOnClickListener(v -> createFlashcardSet());
-        backButton.setOnClickListener(v -> finish());
     }
 
     /**
@@ -87,15 +88,13 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
      */
     private void loadFlashcards() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("groups")
-                .document(groupId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
+        // get the group data from the database
+        db.collection("groups").document(groupId).get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+                        // load the flashcards associated with the group from the database
                         List<String> flashcardIds = (List<String>) documentSnapshot.get("flashcards");
-
                         if (flashcardIds != null && !flashcardIds.isEmpty()) {
+                            // prevention of fetching null flashcards
                             fetchFlashcardsByIds(flashcardIds, db);
                         } else {
                             Toast.makeText(CreateFlashcardSetActivity.this, "No flashcards in this group", Toast.LENGTH_SHORT).show();
@@ -117,16 +116,14 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
     private void fetchFlashcardsByIds(List<String> flashcardIds, FirebaseFirestore db) {
         flashcardList.clear();
         for (String flashcardId : flashcardIds) {
-            db.collection("flashcards")
-                    .document(flashcardId)
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
+            // get the flashcard data from the database
+            db.collection("flashcards").document(flashcardId).get().addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
+                            // creating a Flashcard object based on flashcard data
                             Flashcard flashcard = new Flashcard(flashcardId, documentSnapshot.getString("question"), documentSnapshot.getString("answer"), documentSnapshot.getString("author"));
                             if (flashcard != null) {
-                                Log.d(TAG, "Fetched flashcard: " + flashcard.getQuestion());
                                 flashcardList.add(flashcard);
-                                Log.d(TAG, "Loaded flashcards: " + flashcardList.size());
+                                // update the data of the adapter that regulates flashcard list view
                                 adapter.notifyDataSetChanged();
                             }
                         }
@@ -141,60 +138,59 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
      * Creates a new flashcard set with the selected flashcards, storing it both globally and within the group fields.
      */
     private void createFlashcardSet() {
+        // get the title for the flashcard set from the input field
         String setName = setNameInput.getText().toString().trim();
         if (setName.isEmpty()) {
+            // input field must contain text
             Toast.makeText(this, "Enter a set name", Toast.LENGTH_SHORT).show();
             return;
         }
         if (currentUser == null) {
+            // user must be logged in
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
+        // get the flashcard ids from the selection/view adapter
         List<String> selectedFlashcardIds = adapter.getSelectedFlashcards();
         if (selectedFlashcardIds.isEmpty()) {
+            // at least one flashcard must be selected
             Toast.makeText(this, "Select at least one flashcard", Toast.LENGTH_SHORT).show();
             return;
         }
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // a new set document reference in the 'flashcardsets' global collection
         DocumentReference newSetRef = db.collection("flashcardsets").document();
-        String setId = newSetRef.getId(); // unique setId
-
-        // create a new flashcard set in the flashcardsets collection
+        // unique setId
+        String setId = newSetRef.getId();
+        // create a new flashcard set in the collection
         HashMap<String, Object> flashcardSetData = new HashMap<>();
         flashcardSetData.put("title", setName);
         flashcardSetData.put("author", currentUser.getUid());
         flashcardSetData.put("flashcards", selectedFlashcardIds);
-
-        newSetRef.set(flashcardSetData)
-                .addOnSuccessListener(aVoid -> {
-                    db.collection("groups").document(groupId)
-                            .get()
-                            .addOnSuccessListener(groupDoc -> {
-                                if (groupDoc.exists()) {
-                                    List<String> flashcardSets = (List<String>) groupDoc.get("flashcardsets");
-                                    if (flashcardSets == null) {
-                                        flashcardSets = new ArrayList<>(); // error prevention
-                                    }
-                                    // add the new flashcard set ID to the flashcardsets array in the group
-                                    flashcardSets.add(setId);
-
-                                    db.collection("groups").document(groupId)
-                                            .update("flashcardsets", flashcardSets)
-                                            .addOnSuccessListener(aVoid1 -> {
-                                                Toast.makeText(CreateFlashcardSetActivity.this, "Flashcard set created", Toast.LENGTH_SHORT).show();
-                                                finish();
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                Toast.makeText(CreateFlashcardSetActivity.this, "Failed to update group", Toast.LENGTH_SHORT).show();
-                                            });
-                                }
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(CreateFlashcardSetActivity.this, "Failed to retrieve group data", Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(CreateFlashcardSetActivity.this, "Failed to create set", Toast.LENGTH_SHORT).show();
-                });
+        // get the group that the set will be in from the intent
+        newSetRef.set(flashcardSetData).addOnSuccessListener(aVoid -> {
+            db.collection("groups").document(groupId).get().addOnSuccessListener(groupDoc -> {
+                if (groupDoc.exists()) {
+                    List<String> flashcardSets = (List<String>) groupDoc.get("flashcardsets");
+                    // error prevention
+                    if (flashcardSets == null) {
+                        flashcardSets = new ArrayList<>();
+                    }
+                    // add the new flashcard set ID to the 'flashcardsets' array in the group collection
+                    flashcardSets.add(setId);
+                    db.collection("groups").document(groupId).update("flashcardsets", flashcardSets).addOnSuccessListener(aVoid1 -> {
+                        // if successful
+                        Toast.makeText(CreateFlashcardSetActivity.this, "Flashcard set created", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(CreateFlashcardSetActivity.this, "Failed to update group", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(CreateFlashcardSetActivity.this, "Failed to retrieve group data", Toast.LENGTH_SHORT).show();
+            });
+        }).addOnFailureListener(e -> {
+            Toast.makeText(CreateFlashcardSetActivity.this, "Failed to create set", Toast.LENGTH_SHORT).show();
+        });
     }
 }
