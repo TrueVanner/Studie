@@ -160,6 +160,9 @@ public class CreateFlashcardActivity extends AppCompatActivity {
 
     public void retrieveFlashcardsetData() {
         sets.add("None");
+        if (sets.size() == 1) {
+            displayFlashcardsetTitles();
+        }
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();

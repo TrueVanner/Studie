@@ -51,6 +51,13 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flashcard_set_create);
+
+        Intent intent = getIntent();
+        // retrieve the id of the group that the set is in
+        if (intent != null && intent.hasExtra("group_id")) {
+            groupId = intent.getStringExtra("group_id");
+        }
+
         // redirect to login screen if user is not logged in
         if (groupId == null) {
             Toast.makeText(this, "Group ID not found", Toast.LENGTH_SHORT).show();
@@ -73,12 +80,6 @@ public class CreateFlashcardSetActivity extends AppCompatActivity {
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
-
-        Intent intent = getIntent();
-        // retrieve the id of the group that the set is in
-        if (intent != null && intent.hasExtra("group_id")) {
-            groupId = intent.getStringExtra("group_id");
-        }
 
         loadFlashcards();
     }
