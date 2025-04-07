@@ -160,6 +160,10 @@ public class CreateFlashcardActivity extends AppCompatActivity {
 
     public void retrieveFlashcardsetData() {
         sets.add("None");
+        // Failsafe: display flashcardsets if the only 'set' is None
+        if (sets.size() == 1) {
+            displayFlashcardsetTitles();
+        }
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
