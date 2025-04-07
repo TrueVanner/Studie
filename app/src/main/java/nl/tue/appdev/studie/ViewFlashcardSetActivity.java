@@ -46,29 +46,33 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        if (mAuth.getCurrentUser() == null) { // redirect to login screen if user is not logged in
+        // redirect to login screen if user is not logged in
+        if (mAuth.getCurrentUser() == null) {
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
+            // disposal of the set view
             finish();
         }
-
+        // assignation of the screen elements in flashcard set view
         questionNrTextView = findViewById(R.id.fc_set_view_question_nr_text);
         flashcardStateTextView = findViewById(R.id.fc_set_view_question_text);
         flipButton = findViewById(R.id.fc_set_view_flip_button);
         backButton = findViewById(R.id.fc_set_view_back_button);
         prevButton = findViewById(R.id.fc_set_view_prev_button);
         nextButton = findViewById(R.id.fc_set_view_next_button);
-
+        // buttons onClick handlers
         flipButton.setOnClickListener(this);
         backButton.setOnClickListener(this);
         prevButton.setOnClickListener(this);
         nextButton.setOnClickListener(this);
 
         Intent intent = getIntent();
-
+        // retrieve the id of the group that the set is in
         groupId = intent.getStringExtra("group_id");
+        // retrieve the id of the flashcard set to be viewed
         flashcardSetId = intent.getStringExtra("flashcardSetId");
 
+        // prevention of null fetches from the database
         if (flashcardSetId != null) {
             loadFlashcardSet(flashcardSetId);
         } else {
@@ -81,12 +85,13 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      * @param flashcardSetId passed down flashcard set id with the intent, to fetch from the database
      */
     private void loadFlashcardSet(String flashcardSetId) {
+        // get the flashcard data from the database
         db.collection("flashcardsets").document(flashcardSetId)
                 .get(Source.SERVER)
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         Log.e(TAG, "DocumentSnapshot Data: " + documentSnapshot.getData());
-
+                        // store the ids of the flashcards in the set
                         List<String> flashcardIds = (List<String>) documentSnapshot.get("flashcards");
 
                         if (flashcardIds != null) {
@@ -101,28 +106,30 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
         }).addOnFailureListener(e -> Log.e(TAG, "Error fetching flashcard set", e));
     }
 
+    /**
+     * Retrieves flashcard data in the database from individual flashcards inside a set, creating Flashcard objects to make future retrievals easier in the process.
+     * @param flashcardIds a list of flashcard ids inside a flashcard set
+     */
     private void retrieveFlashcardSetData(List<String> flashcardIds) {
         flashcards.clear();
+        // adding dummy flashcards to prevent issues in loading more indexes than there is
         for(int i = 0; i < expectedFlashcardCount; i++) { flashcards.add(null); }
 
         for (int i = 0; i < flashcardIds.size(); i++) {
             String flashcardId = flashcardIds.get(i);
             int flashcardIndex = i;
-            db.collection("flashcards")
-                    .document(flashcardId)
-                    .get(Source.SERVER)
-                    .addOnSuccessListener(documentSnapshot -> {
+            // retrieving flashcard data
+            db.collection("flashcards").document(flashcardId).get(Source.SERVER).addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
+
                             String question = documentSnapshot.getString("question");
                             String answer = documentSnapshot.getString("answer");
                             String author = documentSnapshot.getString("author");
-
+                            // creating a Flashcard object based on flashcard data
                             Flashcard flashcard = new Flashcard(flashcardId, question, answer, author);
                             flashcards.set(flashcardIndex, flashcard);
-
                             // Update counter
                             loadedFlashcardCount++;
-
                             // Check if all flashcards have been loaded
                             if (loadedFlashcardCount == expectedFlashcardCount) {
                                 loadFlashcard(0); // Load the first flashcard
@@ -141,38 +148,26 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      */
     private void loadFlashcard(int index) {
         if (index >= 0 && index < flashcards.size()) {
+            // flaschard object retrieval
             Flashcard currentFlashcard = flashcards.get(index);
             updateQuestionNr();
+            // reset flaschard context view and state text to question
             isShowingQuestion = true;
             flashcardStateTextView.setText("Question");
-
+            // set the new fragment view
             FlashcardFragment flashcardFragment = FlashcardFragment.newInstance(currentFlashcard.getQuestion(), currentFlashcard.getAnswer());
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_flashcard_view_fc_set, flashcardFragment).commit();
         }
     }
 
     /**
-     * TESTING: A test method to create a local flashcard set to display in the activity fragment.
-     */
-    private void createTestFlashcardSet() {
-        Flashcard flashcard1 = new Flashcard("test_flashcard_1", "Hotel?", "Trivago.", "a1");
-        Flashcard flashcard2 = new Flashcard("test_flashcard_2", "q2", "a2", "a2");
-        flashcards.add(flashcard1);
-        flashcards.add(flashcard2);
-        loadFlashcard(currentFlashcardIndex);
-
-        FlashcardFragment flashcardFragment = FlashcardFragment.newInstance(flashcards.get(currentFlashcardIndex).getQuestion(), flashcards.get(currentFlashcardIndex).getAnswer());
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_flashcard_view_fc_set, flashcardFragment).commit();
-
-        updateQuestionNr();
-    }
-
-    /**
      * In the interval of the flashcard set size, switches to the (if existing) previous flashcard in the set and loads it on the activity.
      */
     private void goToPreviousFlashcard() {
+        // flashcard has to not be the first in the set
         if (currentFlashcardIndex > 0) {
             currentFlashcardIndex--;
+            // load the flashcard in the fragment
             loadFlashcard(currentFlashcardIndex);
         }
     }
@@ -181,8 +176,10 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      * In the interval of the flashcard set size, switches to the (if existing) next flashcard in the set and loads it on the activity.
      */
     private void goToNextFlashcard() {
+        // flashcard has to not be the last in the set
         if (currentFlashcardIndex < flashcards.size() - 1) {
             currentFlashcardIndex++;
+            // load the flashcard in the fragment
             loadFlashcard(currentFlashcardIndex);
         }
     }
@@ -192,10 +189,14 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      * (isShowingQuestion does not retain between different flashcards in the set, resetting to 'true' when switched)
      */
     private void flipFlashcard() {
+        // retrieve flashcard viewport fragment
         FlashcardFragment flashcardFragment = (FlashcardFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_flashcard_view_fc_set);
+        // update boolean variables
         isShowingQuestion = !isShowingQuestion;
         if (flashcardFragment != null) {
-            flashcardFragment.updateFlashcardContent(isShowingQuestion); // display the question or the answer
+            // display the question or the answer
+            flashcardFragment.updateFlashcardContent(isShowingQuestion);
+            // update the flashcard state text at the top of the view
             if (isShowingQuestion) {
                 flashcardStateTextView.setText("Question");
             } else {
@@ -208,22 +209,29 @@ public class ViewFlashcardSetActivity extends AppCompatActivity implements View.
      * Updates the flashcard number display within the flashcard set view and resets the flashcard state viewport (back to question).
      */
     private void updateQuestionNr() {
+        // update "Card X of X" text at the top of the screen
         questionNrTextView.setText("Card " + (currentFlashcardIndex + 1) + " of " + flashcards.size());
+        // update the card state text
         flashcardStateTextView.setText("Question");
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fc_set_view_flip_button) {
+            // 'flips' the currently viewed flashcard in the set, swapping between 'question' and 'answer' sides
             flipFlashcard();
         } else if (v.getId() == R.id.fc_set_view_back_button) {
+            // returns back to the group screen of the group the set is in by passing the intent with the id of the group to the GroupActivity
             Intent intent = new Intent(ViewFlashcardSetActivity.this, GroupActivity.class);
             intent.putExtra("id", groupId);
             startActivity(intent);
+            // disposal of the set view
             finish();
         } else if (v.getId() == R.id.fc_set_view_prev_button) {
+            // flashcard navigation to the previous index in the set
             goToPreviousFlashcard();
         } else if (v.getId() == R.id.fc_set_view_next_button) {
+            // flashcard navigation to the next index in the set
             goToNextFlashcard();
         }
     }

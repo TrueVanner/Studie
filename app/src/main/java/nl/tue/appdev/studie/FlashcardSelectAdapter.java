@@ -22,6 +22,7 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
 
     private static final String TAG = "FlashcardSelecterAdapter";
 
+
     private final ArrayList<Flashcard> flashcardList;
     private final ArrayList<String> selectedFlashcards;
 
@@ -33,25 +34,28 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // get viewport of flashcard selection layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.flashcard_select, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // get flashcard from the list
         Flashcard flashcard = flashcardList.get(position);
+        // set the text on the view to flashcard's question
         holder.questionTextView.setText(flashcard.getQuestion());
-
+        // configure the checkbox on the view
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(selectedFlashcards.contains(flashcard.getId()));
-
+        // onChange on checklist selection
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
+                // remove the flashcard from the selection
                 selectedFlashcards.add(flashcard.getId());
-                Log.d(TAG, "Added: " + flashcard.getId());
             } else {
+                // remove the flashcard from the selection
                 selectedFlashcards.remove(flashcard.getId());
-                Log.d(TAG, "Removed: " + flashcard.getId());
             }
             Log.d(TAG, "Selected flashcards: " + selectedFlashcards);
         });
@@ -67,7 +71,7 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
     }
 
     /**
-     * ViewHolder for flashcard items.
+     * ViewHolder for flashcard items in the selection plane.
      */
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView questionTextView;
@@ -75,6 +79,7 @@ public class FlashcardSelectAdapter extends RecyclerView.Adapter<FlashcardSelect
 
         ViewHolder(View itemView) {
             super(itemView);
+            // question from the flashcard question
             questionTextView = itemView.findViewById(R.id.fc_select_question);
             checkBox = itemView.findViewById(R.id.flashcard_checkbox);
         }
